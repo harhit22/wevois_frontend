@@ -1,0 +1,98 @@
+
+.sidebar {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    padding-top: 56px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #FFF !important;
+    border: 1px solid black;
+    width: 200px; 
+    height: 95vh;
+    border-radius: 10px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);}
+  
+  .main-content {
+    margin-left: 220px;
+    padding: 30px;
+  }
+  .main{
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 10px;
+  }
+  
+  .card {
+    margin-bottom: 20px;
+  }
+  
+  .card-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .card-text {
+    color: #666;
+  }
+  
+  .btn-primary {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+  
+  .btn-primary:hover {
+    background-color: #218838;
+    border-color: #218838;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+  
+  .btn-success:hover {
+    background-color: #218838;
+    border-color: #218838;
+  }
+  
+  .btn-outline-secondary {
+    color: #6c757d;
+  }
+  
+  .btn-outline-secondary:hover {
+    color: #333;
+  }
+  
+
+  .create-project-button{
+    background-color: #218838;
+    color: #fff;
+  }
+
+  .create-project-button :hover{
+    background-color: #1b682b !important;
+    color: #fff;
+  }
+/* UserProject.css */
+
+.nav-item {
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-item:last-child {
+  border-bottom: none; /* Remove bottom border for the last navItem */
+}
+
+.nav-link {
+  color: #222;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  border-radius: 10px;
+}
+
+.nav-link:hover {
+  background-color: rgba(11, 40, 3, 0.7) !important;
+  color: #ffffff;
+}

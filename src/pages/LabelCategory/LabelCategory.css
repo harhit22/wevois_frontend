@@ -1,0 +1,31 @@
+.label-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .label-item {
+    padding: 5px;
+    margin: 4px 0;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .label-item:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.02);
+  }
+  
+  .label-item.selected {
+    background-color: #4caf50;
+    color: #fff;
+    border-color: #4caf50;
+  }
+  
+  .label-item p {
+    margin: 0;
+  }
+  

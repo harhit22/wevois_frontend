@@ -1,0 +1,98 @@
+.service {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(to bottom, #b2f7a5, #87ed87); /* Replace with your desired gradient colors */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    overflow: hidden;
+    clip-path: polygon(0 25%, 100% 0, 100% 75%, 0% 100%);
+}
+  
+  .service-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  .service-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column; /* Change to column for responsiveness */
+    justify-content: space-around;
+    align-items: center;
+    width: 80%;
+    text-align: center; /* Center text on smaller screens */
+  }
+  
+  .service-content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .service-content h1 {
+    font-size: 2em; /* Adjust font size for smaller screens */
+    margin: 0;
+  }
+  
+  .service-content p {
+    font-size: 1.2em; /* Adjust font size for smaller screens */
+    margin: 20px 0 0;
+  }
+  
+  .service-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: relative;
+    margin-top: 20px; /* Add margin for spacing */
+  }
+  
+  .service-image img {
+    max-width: 100%;
+    border-radius: 20px;
+  }
+  
+  .service-image::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: inherit;
+    z-index: 2;
+    transform: skewY(-5deg);
+    transform-origin: bottom left;
+  }
+  
+  
+  /* Media Queries for Responsiveness */
+  @media (min-width: 768px) {
+    .service-container {
+      flex-direction: row; /* Change to row for larger screens */
+      text-align: left; /* Left align text on larger screens */
+    }
+  
+    .service-content {
+      text-align: left;
+    }
+  
+    .service-content h1 {
+      font-size: 3em; /* Increase font size for larger screens */
+    }
+  
+    .service-content p {
+      font-size: 1.5em; /* Increase font size for larger screens */
+    }
+  
+    
+  }
+  

@@ -1,0 +1,64 @@
+body {
+    font-family: Montserrat, sans-serif;
+  }
+  .navbar{
+    background-color: #17594A;
+  }
+  .navbar-brand {
+    background-image: url("https://pbs.twimg.com/profile_images/1158288883655700480/Tfp0mU5A_400x400.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+  }
+  
+  .navbar-nav .nav-item:hover {
+    background-color: rgba(180, 190, 203, 0.4);
+  }
+
+  .navbar a {
+    font-size: 12px;
+  }
+
+  .navbar-brand-text {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .navbar-brand-text:hover {
+    color: #00ff00; /* Green color */
+  }
+  
+  .navbar-brand-text:hover::before,
+  .navbar-brand-text:hover::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #00ff00; /* Green color */
+    bottom: -2px;
+    left: 0;
+    transform: scaleX(0);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .navbar-brand-text:hover::before {
+    transform-origin: right;
+  }
+  
+  .navbar-brand-text:hover::after {
+    transform-origin: left;
+  }
+  
+  .navbar-brand-text:hover::before,
+  .navbar-brand-text:hover::after {
+    transform: scaleX(1);
+  }
+  
+.nav-item button{
+  font-size: 12px;
+  color: #fff;
+}
