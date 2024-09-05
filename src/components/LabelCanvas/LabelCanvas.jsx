@@ -4,6 +4,7 @@ import { Stage, Layer, Image as KonvaImage, Rect, Text } from "react-konva";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { purple } from "@mui/material/colors";
+import useKeyHandler from "../../hooks/useKeyHandler";
 
 const LabelCanvas = ({
   imageUrl,
@@ -23,7 +24,7 @@ const LabelCanvas = ({
   const [rectangles, setRectangles] = useState([]);
   const [selectedRectIndex, setSelectedRectIndex] = useState(null);
   // eslint-disable-next-line
-  const [cursorStyle, setCursorStyle] = useState("default");
+  const [cursorStyle] = useState("default");
 
   console.log(imageid);
 
@@ -98,7 +99,7 @@ const LabelCanvas = ({
       }
     };
     get_label_image_id();
-  }, []);
+  }, [imageid, catId, setAlreadyLabelImageId]);
 
   const get_label_image_id = async () => {
     try {
@@ -161,6 +162,8 @@ const LabelCanvas = ({
     try {
       const imageData = new FormData();
       imageData.append("category", catId);
+      imageData.append("uploaded_by", localStorage.getItem("user_id"));
+
       const response = await fetch(imageUrl);
       const imageName = imageUrl.split("/").pop();
       if (!response.ok) {
@@ -173,91 +176,92 @@ const LabelCanvas = ({
       imageData.append("project", projectId);
       imageData.append("image_file", file);
 
-      const img = new window.Image();
-      img.src = URL.createObjectURL(blob);
-      img.onload = async () => {
-        const imageWidth = img.width;
-        const imageHeight = img.height;
+      // Wait for the image to load and get its dimensions
+      const imageDimensions = await new Promise((resolve, reject) => {
+        const img = new window.Image();
+        img.src = URL.createObjectURL(blob);
+        img.onload = () => resolve({ width: img.width, height: img.height });
+        img.onerror = (e) => reject(new Error("Failed to load image"));
+      });
 
-        imageData.append("image_width", imageWidth);
-        imageData.append("image_height", imageHeight);
+      imageData.append("image_width", imageDimensions.width);
+      imageData.append("image_height", imageDimensions.height);
 
-        const token = localStorage.getItem("token");
-        const imageResponse = await fetch(
-          "http://127.0.0.1:8000/categoryImageSave/save_category_labeled_image/",
+      const token = localStorage.getItem("token");
+      const imageResponse = await fetch(
+        "http://127.0.0.1:8000/categoryImageSave/save_category_labeled_image/",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: imageData,
+        }
+      );
+
+      if (!imageResponse.ok) {
+        const errorMessage = await imageResponse.text();
+        throw new Error(`Failed to save image: ${errorMessage}`);
+      }
+
+      const imageResult = await imageResponse.json();
+      const image_id = imageResult.id;
+
+      // Save each rectangle label
+      for (const rect of rectangles) {
+        const labelResponse = await fetch(
+          "http://127.0.0.1:8000/categoryImageSave/save_category_label_for_image/",
           {
             method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            body: imageData,
-          }
-        );
-
-        if (!imageResponse.ok) {
-          const errorMessage = await imageResponse.text();
-          throw new Error(`Failed to save image: ${errorMessage}`);
-        }
-
-        const imageResult = await imageResponse.json();
-        const image_id = imageResult.id;
-
-        for (const rect of rectangles) {
-          const labelResponse = await fetch(
-            "http://127.0.0.1:8000/categoryImageSave/save_category_label_for_image/",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                category_image: image_id,
-                label: rect.name,
-                x: rect.x,
-                y: rect.y,
-                width: rect.width,
-                height: rect.height,
-              }),
-            }
-          );
-
-          if (!labelResponse.ok) {
-            const labelErrorMessage = await labelResponse.text();
-            throw new Error(
-              `Failed to save label "${rect.label}": ${labelErrorMessage}`
-            );
-          }
-        }
-
-        const updateStatusResponse = await fetch(
-          `http://127.0.0.1:8000/categoryImage/update_category_image_status/${imageid}/`,
-          {
-            method: "PATCH",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ status: "labeled" }),
+            body: JSON.stringify({
+              category_image: image_id,
+              label: rect.name,
+              x: rect.x,
+              y: rect.y,
+              width: rect.width,
+              height: rect.height,
+            }),
           }
         );
 
-        if (!updateStatusResponse.ok) {
-          const statusErrorMessage = await updateStatusResponse.text();
+        if (!labelResponse.ok) {
+          const labelErrorMessage = await labelResponse.text();
           throw new Error(
-            `Failed to update image status: ${statusErrorMessage}`
+            `Failed to save label "${rect.label}": ${labelErrorMessage}`
           );
         }
+      }
 
-        await get_label_image_id();
+      // Update the status of the image
+      const updateStatusResponse = await fetch(
+        `http://127.0.0.1:8000/categoryImage/update_category_image_status/${imageid}/`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: "labeled" }),
+        }
+      );
 
-        toast.update(toastId, {
-          render: "Processing completed",
-          type: "success",
-          isLoading: false,
-          autoClose: 200,
-        });
-      };
+      if (!updateStatusResponse.ok) {
+        const statusErrorMessage = await updateStatusResponse.text();
+        throw new Error(`Failed to update image status: ${statusErrorMessage}`);
+      }
+
+      await get_label_image_id();
+
+      toast.update(toastId, {
+        render: "Processing completed",
+        type: "success",
+        isLoading: false,
+        autoClose: 200,
+      });
     } catch (error) {
       console.error("Error saving labels:", error);
       toast.update(toastId, {
@@ -329,87 +333,22 @@ const LabelCanvas = ({
     }
   };
 
-  useEffect(() => {
-    const keyMappings = {
-      Condition: {
-        KeyD: 0,
-        KeyF: 1,
-      },
-      Grade: {
-        KeyF: 0,
-        KeyN: 1,
-        KeyM: 2,
-      },
-      Toxicity: {
-        KeyT: 0,
-        KeyN: 1,
-      },
-      WasteType: {
-        KeyF: 0,
-        KeyN: 1,
-      },
-      Material: {
-        KeyT: 0,
-        KeyH: 1,
-      },
-    };
-
-    const handleKeyDown = (e) => {
-      const keyMap = keyMappings[category]?.[e.code];
-      if (keyMap !== undefined && selectedRectIndex !== null) {
-        const newLabel = labelsList[keyMap];
-        setSelectedLabel(newLabel);
-        setRectangles((rects) =>
-          rects.map((rect, index) =>
-            index === selectedRectIndex
-              ? { ...rect, name: newLabel, color: labelColors[newLabel] }
-              : rect
-          )
-        );
-      }
-      if (e.key === "Enter" && selectedRectIndex !== null) {
-        if (selectedRectIndex + 1 < rectangles.length) {
-          setSelectedRectIndex(selectedRectIndex + 1);
-        } else {
-          const allLabeled = rectangles.every(
-            (rect) => rect.name && rect.name.trim() !== ""
-          );
-          if (allLabeled) {
-            if (alreadyLabelImageID === "none") {
-              handleSave(rectangles, catId, imageUrl);
-            } else {
-              handleSaveAlreadyLabelImage(alreadyLabelImageID, rectangles);
-            }
-          } else {
-            toast.error("Please label all rectangles before saving.", {
-              autoClose: 3000,
-            });
-          }
-        }
-      }
-      if (e.key >= "1" && e.key <= "9") {
-        const rectIndex = parseInt(e.key) - 1;
-        if (rectIndex < rectangles.length) {
-          handleRectSelect(rectIndex);
-        }
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    setSelectedLabel("");
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [
-    selectedRectIndex,
+  useKeyHandler(
     category,
-    labelsList,
-    catId,
-    handleSave,
-    imageUrl,
+    selectedRectIndex,
+    setSelectedRectIndex,
+    setSelectedLabel,
     rectangles,
+    setRectangles,
+    labelsList,
     labelColors,
-  ]);
+    handleSave,
+    handleSaveAlreadyLabelImage,
+    alreadyLabelImageID,
+    catId,
+    imageUrl,
+    handleRectSelect
+  );
 
   return (
     <>

@@ -9,7 +9,15 @@ const Gallery = ({ projectId }) => {
   const [cursorStyle, setCursorStyle] = useState("default");
   const [showOpacity, setShowOpacity] = useState(null);
   const [previousImage, setPreviousImage] = useState(null);
-  const [imageStack, setImageStack] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const handleProcessingStart = () => {
+    setIsProcessing(true);
+  };
+
+  const handleProcessingEnd = () => {
+    setIsProcessing(false);
+  };
 
   useEffect(() => {
     document.body.style.cursor = cursorStyle;
@@ -92,7 +100,14 @@ const Gallery = ({ projectId }) => {
     setCursorStyle("crosshair");
   };
 
+  const handlePolygonSelection = () => {
+    setBoxSelection(false);
+    setShowOpacity(null);
+    setCursorStyle("crosshair");
+  };
+
   const handleNext = useCallback(async () => {
+    setLoading(true);
     setPreviousImage(null);
     try {
       await fetchNextImage();
@@ -119,6 +134,7 @@ const Gallery = ({ projectId }) => {
 
     setLabelData({});
     setBoxSelection(false);
+    setLoading(false);
   }, [fetchNextImage, currentImage]);
 
   const handlePrevious = useCallback(() => {
@@ -136,6 +152,10 @@ const Gallery = ({ projectId }) => {
     return <div>Loading...</div>;
   }
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <div className="gallery-contain">
@@ -148,19 +168,24 @@ const Gallery = ({ projectId }) => {
             &lt;
           </button>
         )}
-        <button
-          id="next"
-          className="btn btn-primary gallery-nav-button gallery-next-button"
-          onClick={handleNext}
-        >
-          &gt;
-        </button>
+        {loading === false ? (
+          <button
+            id="next"
+            className="btn btn-primary gallery-nav-button gallery-next-button"
+            onClick={handleNext}
+            disabled={isProcessing}
+          >
+            &gt;
+          </button>
+        ) : (
+          ""
+        )}
       </div>
       <div className="gallery-container">
         <div className="image-container">
           {!previousImage ? (
             <Canvas
-              imageUrl={`http://127.0.0.1:8000/${currentImage.image_path}`}
+              imageUrl={`${currentImage.image_path}`}
               labelData={labelData[currentImage.id] || []}
               onLabelChange={handleLabelChange}
               boxSelection={boxSelection}
@@ -171,10 +196,12 @@ const Gallery = ({ projectId }) => {
               image_name={currentImage.filename}
               image_path={currentImage.image_path}
               nextClick={"nextClick"}
+              onProcessingStart={handleProcessingStart}
+              onProcessingEnd={handleProcessingEnd}
             />
           ) : (
             <Canvas
-              imageUrl={`http://127.0.0.1:8000/static${previousImage.image_file}`}
+              imageUrl={`${previousImage.image_file}`}
               labelData={labelData}
               onLabelChange={handleLabelChange}
               boxSelection={boxSelection}

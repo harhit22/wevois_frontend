@@ -1,69 +1,35 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import "./uploadData.css"; // Import custom CSS for additional styling if needed
-
+import {
+  handleFileChange,
+  handleUpload,
+} from "../../utils/uploadData/uploadutils";
+import "./uploadData.css";
+import Loader from "../../components/ui/Loader/Loader";
 const UploadDatasetForm = () => {
   const { projectId } = useParams();
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadError, setUploadError] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (!file) {
-      return;
-    }
-
-    const fileType = file.type;
-    if (
-      fileType !== "application/zip" &&
-      !file.name.toLowerCase().endsWith(".zip")
-    ) {
-      setUploadError("Please select a zip file");
-      setSelectedFile(null);
-      return;
-    }
-
-    setSelectedFile(file);
-    setUploadError(null);
-  };
-
-  const handleUpload = async (event) => {
-    event.preventDefault();
-    if (!selectedFile) {
-      setUploadError("Please select a file");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("dataset", selectedFile);
-
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/project/upload/api/${projectId}/upload_dataset/`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-      if (response.ok) {
-        setUploadSuccess(true);
-        setUploadError(null);
-      } else {
-        throw new Error("Failed to upload dataset");
-      }
-    } catch (error) {
-      console.error("Error uploading dataset:", error);
-      setUploadError("Failed to upload dataset");
-    }
-  };
+  const [loading, setLoading] = useState(false); // Add loading state
 
   return (
     <div className="upload-main-div mt-2">
       <div className="card shadow-sm">
         <div className="card-body">
           <h3 className="card-title">Upload Dataset</h3>
-          <form onSubmit={handleUpload}>
+          <form
+            onSubmit={(event) => {
+              setLoading(true); // Set loading to true when upload starts
+              handleUpload(
+                event,
+                projectId,
+                selectedFile,
+                setUploadSuccess,
+                setUploadError
+              ).finally(() => setLoading(false)); // Reset loading to false after upload
+            }}
+          >
             <div className="form-group">
               <label htmlFor="fileInput">Choose a zip file:</label>
               <br />
@@ -72,11 +38,19 @@ const UploadDatasetForm = () => {
                 accept=".zip"
                 className="form-control"
                 id="fileInput"
-                onChange={handleFileChange}
+                onChange={(event) =>
+                  handleFileChange(event, setSelectedFile, setUploadError)
+                }
+                disabled={loading} // Disable input while loading
               />
             </div>
-            <button type="submit" className="btn btn-primary mt-3">
-              Upload Dataset
+            <button
+              type="submit"
+              className="btn btn-primary mt-3"
+              disabled={loading || !selectedFile} // Disable button while loading or if no file selected
+            >
+              {loading ? <Loader /> : "Upload Dataset"}
+              {/* Show loading text */}
             </button>
           </form>
           {uploadError && (

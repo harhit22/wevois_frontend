@@ -1,0 +1,50 @@
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+  }
+  
+  .spinner {
+    position: relative;
+    width: 64px;
+    height: 64px;
+  }
+  
+  .dot {
+    width: 12px;
+    height: 12px;
+    background-color: #a1dcae;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    animation: orbit 1.2s linear infinite;
+  }
+  
+  .dot1 {
+    animation-delay: 0s;
+  }
+  
+  .dot2 {
+    animation-delay: 0.3s;
+  }
+  
+  .dot3 {
+    animation-delay: 0.6s;
+  }
+  
+  .dot4 {
+    animation-delay: 0.9s;
+  }
+  
+  @keyframes orbit {
+    0% {
+      transform: rotate(0deg) translateX(26px) rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg) translateX(26px) rotate(-360deg);
+    }
+  }
+  

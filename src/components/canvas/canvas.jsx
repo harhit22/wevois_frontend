@@ -13,6 +13,8 @@ const Canvas = ({
   projectID,
   originalImageId,
   nextClick,
+  onProcessingStart,
+  onProcessingEnd,
 }) => {
   const [image] = useImage(imageUrl);
   const [rectangles, setRectangles] = useState([]);
@@ -24,6 +26,7 @@ const Canvas = ({
   const [cursorStyle, setCursorStyle] = useState("default");
   const [getLabeledImage, setGetLabeledImage] = useState([]);
   const [isAnnotatedImage, setIsAnnotatedImage] = useState();
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (nextClick) {
@@ -63,6 +66,7 @@ const Canvas = ({
         throw new Error("Failed to fetch the already annotated image.");
       }
       const data = await response.json();
+      console.log(data);
       setIsAnnotatedImage((prevState) => {
         // Calculate the new state based on prevState
         return data;
@@ -107,6 +111,7 @@ const Canvas = ({
   };
 
   const handleMouseDown = (e) => {
+    if (isSaving) return;
     if (
       e.target.attrs.id === "labelDropdown" ||
       e.target.attrs.id === "labelNameInput"
@@ -136,6 +141,7 @@ const Canvas = ({
     }
   };
   const handleMouseMove = (e) => {
+    if (isSaving) return;
     if (newRect) {
       const { x, y } = e.target.getStage().getPointerPosition();
       const newX = newRect.x;
@@ -151,6 +157,7 @@ const Canvas = ({
   };
 
   const handleMouseUp = () => {
+    if (isSaving) return;
     if (newRect) {
       const boundedRect = {
         ...newRect,
@@ -269,80 +276,79 @@ const Canvas = ({
   const handleSave = async (filteredRectangles) => {
     const toastId = toast.loading("Processing...");
     try {
-      await fetchDatasetFiles(projectID, async () => {
-        const imageData = new FormData();
-        imageData.append("project", projectID);
-        imageData.append("original_image", originalImageId);
-        imageData.append("uploaded_by", localStorage.getItem("user_id"));
-        const token = localStorage.getItem("token");
-        const modifiedImageUrl = imageUrl.replace("/static", "");
+      setIsSaving(true);
+      // Wait for the dataset files to be fetched
+      onProcessingStart();
+      await fetchDatasetFiles(projectID);
 
-        const response = await fetch(modifiedImageUrl);
-        const imageName = imageUrl.split("/").pop();
-        if (!response.ok) {
-          throw new Error("Failed to fetch image file");
+      const imageData = new FormData();
+      imageData.append("project", projectID);
+      imageData.append("original_image", originalImageId);
+      imageData.append("uploaded_by", localStorage.getItem("user_id"));
+      const token = localStorage.getItem("token");
+      const modifiedImageUrl = imageUrl.replace("/static", "");
+
+      const response = await fetch(modifiedImageUrl);
+      const imageName = imageUrl.split("/").pop();
+      if (!response.ok) {
+        throw new Error("Failed to fetch image file");
+      }
+      const blob = await response.blob();
+      const file = new File([blob], imageName, { type: "image/jpeg" });
+      imageData.append("image_file", file);
+
+      let image_id = null;
+
+      if (!isAnnotatedImage && filteredRectangles.length !== 0) {
+        // Save the image
+        const imageResponse = await fetch(
+          "http://127.0.0.1:8000/project/label_data/save_labeled_image/",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: imageData,
+          }
+        );
+
+        if (!imageResponse.ok) {
+          const errorMessage = await imageResponse.text();
+          throw new Error(`Failed to save image: ${errorMessage}`);
         }
+        const imageResult = await imageResponse.json();
+        image_id = imageResult.id;
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch image file");
-        }
-        const blob = await response.blob();
-        const file = new File([blob], imageName, { type: "image/jpeg" });
-
-        imageData.append("image_file", file);
-
-        let image_id = null;
-
-        if (!isAnnotatedImage && filteredRectangles.length !== 0) {
-          const imageResponse = await fetch(
-            "http://127.0.0.1:8000/project/label_data/save_labeled_image/",
+        // Save labels for the image
+        for (const rect of filteredRectangles) {
+          const labelResponse = await fetch(
+            "http://127.0.0.1:8000/project/label_data/save_label_for_image/",
             {
               method: "POST",
               headers: {
+                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-              body: imageData,
+              body: JSON.stringify({
+                image: image_id,
+                label: rect.label,
+                x: rect.x,
+                y: rect.y,
+                width: rect.width,
+                height: rect.height,
+              }),
             }
           );
 
-          if (!imageResponse.ok) {
-            const errorMessage = await imageResponse.text();
-            throw new Error(`Failed to save image: ${errorMessage}`);
+          if (!labelResponse.ok) {
+            const labelErrorMessage = await labelResponse.text();
+            throw new Error(
+              `Failed to save label "${rect.label}": ${labelErrorMessage}`
+            );
           }
-          const imageResult = await imageResponse.json();
-          image_id = imageResult.id;
-          console.log(rectangles);
-          await fetchDatasetFiles(projectID, async () => {
-            for (const rect of filteredRectangles) {
-              const labelResponse = await fetch(
-                "http://127.0.0.1:8000/project/label_data/save_label_for_image/",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                  body: JSON.stringify({
-                    image: image_id,
-                    label: rect.label,
-                    x: rect.x,
-                    y: rect.y,
-                    width: rect.width,
-                    height: rect.height,
-                  }),
-                }
-              );
-              fetchAlreadyLabelImage();
-
-              if (!labelResponse.ok) {
-                const labelErrorMessage = await labelResponse.text();
-                throw new Error(
-                  `Failed to save label "${rect.label}": ${labelErrorMessage}`
-                );
-              }
-            }
-          });
-        } else {
+        }
+      } else {
+        if (isAnnotatedImage) {
           const deleteResponse = await fetch(
             "http://127.0.0.1:8000/project/label_data/delete_existing_labels/",
             {
@@ -359,63 +365,61 @@ const Canvas = ({
             const errorMessage = await deleteResponse.text();
             throw new Error(`Failed to delete labels: ${errorMessage}`);
           }
+        }
 
-          await fetchDatasetFiles(projectID, async () => {
-            for (const rect of filteredRectangles) {
-              const labelResponse = await fetch(
-                "http://127.0.0.1:8000/project/label_data/save_label_for_image/",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                  body: JSON.stringify({
-                    image: isAnnotatedImage,
-                    label: rect.label,
-                    x: rect.x,
-                    y: rect.y,
-                    width: rect.width,
-                    height: rect.height,
-                  }),
-                }
-              );
-
-              if (!labelResponse.ok) {
-                const labelErrorMessage = await labelResponse.text();
-                throw new Error(
-                  `Failed to save label "${rect.label}": ${labelErrorMessage}`
-                );
-              }
+        // Save new labels for the image
+        for (const rect of filteredRectangles) {
+          const labelResponse = await fetch(
+            "http://127.0.0.1:8000/project/label_data/save_label_for_image/",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                image: isAnnotatedImage,
+                label: rect.label,
+                x: rect.x,
+                y: rect.y,
+                width: rect.width,
+                height: rect.height,
+              }),
             }
-          });
-        }
-
-        const updateStatusResponse = await fetch(
-          `http://127.0.0.1:8000/project/upload/update_image_status/${originalImageId}/`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ status: "completed" }),
-          }
-        );
-
-        if (!updateStatusResponse.ok) {
-          const statusErrorMessage = await updateStatusResponse.text();
-          throw new Error(
-            `Failed to update image status: ${statusErrorMessage}`
           );
+
+          if (!labelResponse.ok) {
+            const labelErrorMessage = await labelResponse.text();
+            throw new Error(
+              `Failed to save label "${rect.label}": ${labelErrorMessage}`
+            );
+          }
         }
-      });
+      }
+
+      // Update image status
+      const updateStatusResponse = await fetch(
+        `http://127.0.0.1:8000/project/upload/update_image_status/${originalImageId}/`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: "completed" }),
+        }
+      );
+
+      if (!updateStatusResponse.ok) {
+        const statusErrorMessage = await updateStatusResponse.text();
+        throw new Error(`Failed to update image status: ${statusErrorMessage}`);
+      }
 
       toast.update(toastId, {
         render: "Processing completed",
         type: "success",
         isLoading: false,
-        autoClose: 200,
+        autoClose: 1000,
       });
     } catch (error) {
       console.error("Error saving labels:", error);
@@ -426,6 +430,9 @@ const Canvas = ({
         autoClose: 3000,
       });
     }
+    onProcessingEnd();
+    setIsSaving(false);
+    fetchAlreadyLabelImage();
   };
 
   return (

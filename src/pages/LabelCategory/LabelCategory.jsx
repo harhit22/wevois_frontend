@@ -16,10 +16,10 @@ const LabelCategory = () => {
   };
 
   useEffect(() => {
-    const fetchDatasetFiles = async () => {
+    const fetchNextImage = async () => {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/categoryImage/images/without-category/${catId}/`,
+          `http://127.0.0.1:8000/categoryImage/next/${projectId}/${catId}/`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -27,17 +27,18 @@ const LabelCategory = () => {
           }
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch dataset files.");
+          throw new Error("Failed to fetch the next image.");
         }
         const data = await response.json();
+        console.log(data);
         setDatasetFiles(data);
       } catch (error) {
         console.error("Error:", error);
       }
     };
 
-    fetchDatasetFiles();
-  }, [catId]);
+    fetchNextImage();
+  }, [projectId, catId]);
 
   useEffect(() => {
     const categories_data = async () => {
@@ -102,12 +103,9 @@ const LabelCategory = () => {
           </nav>
           <main className="col-md-9 ml-sm-auto col-lg-10 px-4">
             <div className="dataset-list-container">
-              {datasetFiles.length > 0 ? (
+              {datasetFiles ? (
                 <LabelGallery
-                  images={datasetFiles.map((file) => ({
-                    id: file.id,
-                    url: file.image_file,
-                  }))}
+                  images={datasetFiles}
                   id={projectId}
                   labelsList={labelList}
                   labelColors={labelColors}

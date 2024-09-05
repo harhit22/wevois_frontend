@@ -1,35 +1,52 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import URLs from "../../constant/url";
 import "./UserProject.css";
 import Navbar from "../../components/basic/navbar/navbar";
+import fetchProjects from "../../pages_services/UserProjects/FetchProjects/FetchProjects";
+import URLs from "../../constant/url";
 
 const ProjectList = () => {
   const [projects, setProjects] = useState([]);
+  const [inviteProjectId, setInviteProjectId] = useState(null);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteError, setInviteError] = useState("");
+  const [inviteSuccess, setInviteSuccess] = useState("");
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(`${URLs.PROJECT_URL}projects/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch projects.");
-        }
-
-        const data = await response.json();
-        setProjects(data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
+    const getProjects = async () => {
+      const data = await fetchProjects();
+      setProjects(data);
     };
 
-    fetchProjects();
+    getProjects();
   }, []);
+
+  const handleInvite = async (projectId) => {
+    try {
+      const response = await fetch(
+        `${URLs.PROJECT_URL}api/${projectId}/invite/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ email: inviteEmail }),
+        }
+      );
+      if (response.ok) {
+        setInviteSuccess("Invitation sent successfully!");
+        setInviteError("");
+      } else {
+        const errorData = await response.json();
+        setInviteError(errorData.email || "Failed to send invitation.");
+        setInviteSuccess("");
+      }
+    } catch (error) {
+      setInviteError("Failed to send invitation.");
+      setInviteSuccess("");
+    }
+  };
 
   return (
     <>
@@ -76,15 +93,48 @@ const ProjectList = () => {
                     <h5 className="card-title">{project.name}</h5>
                     <p className="card-text">{project.description}</p>
                   </div>
-                  <div className="card-footer">
+                  <div className="card-footer d-flex justify-content-between">
                     <NavLink
                       className="btn btn-primary main-project-btn"
                       to={`/ProjectDashBoard/${project.id}`}
                     >
                       Project
                     </NavLink>
+                    <button
+                      className="btn btn-primary main-project-btn"
+                      onClick={() => setInviteProjectId(project.id)}
+                    >
+                      Invite
+                    </button>
                   </div>
                 </div>
+                {inviteProjectId === project.id && (
+                  <div className="invite-form mt-3">
+                    <input
+                      type="email"
+                      className="form-control mb-2"
+                      placeholder="Enter email"
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                    />
+                    <button
+                      className="btn btn-success"
+                      onClick={() => handleInvite(project.id)}
+                    >
+                      Send Invitation
+                    </button>
+                    {inviteError && (
+                      <div className="alert alert-danger mt-2">
+                        {inviteError}
+                      </div>
+                    )}
+                    {inviteSuccess && (
+                      <div className="alert alert-success mt-2">
+                        {inviteSuccess}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>

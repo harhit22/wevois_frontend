@@ -4,6 +4,7 @@ import "./LabelGallery.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import Loader from "../ui/Loader/Loader";
 
 const LabelGallery = ({
   images,
@@ -22,6 +23,7 @@ const LabelGallery = ({
   const [showOpacity, setShowOpacity] = useState(null);
   const [currentImage, setCurrentImage] = useState(null);
   const [alreadyLabelImageID, setAlreadyLabelImageId] = useState();
+  const [loading, setLoading] = useState(false); // Add loading state
 
   useEffect(() => {
     document.body.style.cursor = cursorStyle;
@@ -32,6 +34,7 @@ const LabelGallery = ({
   }, [cursorStyle]);
 
   const fetchNextImage = useCallback(async () => {
+    setLoading(true); // Start loading when fetching the next image
     try {
       const response = await fetch(
         `http://127.0.0.1:8000/categoryImage/next/${id}/${catId}/`,
@@ -45,9 +48,12 @@ const LabelGallery = ({
         throw new Error("Failed to fetch the next image.");
       }
       const data = await response.json();
+      console.log(data);
       setCurrentImage(data);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setLoading(false); // Stop loading when the image is fetched
     }
   }, [id, catId]);
 
@@ -76,6 +82,7 @@ const LabelGallery = ({
         throw new Error("Failed to check and reassign status.");
       }
       const data = await response.json();
+      console.log(data);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -116,6 +123,10 @@ const LabelGallery = ({
     };
   }, [handlePrevious, handleNext]);
 
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <>
       <div className="gallery-contain">
@@ -124,22 +135,29 @@ const LabelGallery = ({
           id="previous"
           onClick={handlePrevious}
           className="my_button"
+          disabled={loading} // Disable button while loading
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </Link>
-        <Link to="#" id="next" onClick={handleNext} className="my_button">
+        <Link
+          to="#"
+          id="next"
+          onClick={handleNext}
+          className="my_button"
+          disabled={loading} // Disable button while loading
+        >
           <FontAwesomeIcon icon={faArrowRight} />
         </Link>
       </div>
 
       <div className="gallery-container">
         <div className="image-container">
-          {currentImage ? (
+          {loading ? ( // Show loading indicator if loading
+            <div className="loading-screen">Loading...</div>
+          ) : currentImage ? (
             <>
               <LabelCanvas
-                imageUrl={
-                  "http://127.0.0.1:8000" + currentImage.image.image_file
-                }
+                imageUrl={currentImage.image.firebase_url}
                 labelData={labelData[currentIndex] || []}
                 onLabelChange={handleLabelChange}
                 boxSelection={boxSelection}

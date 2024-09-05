@@ -2,37 +2,14 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../../components/basic/navbar/navbar";
 import { useParams } from "react-router-dom";
 import { NavLink } from "react-router-dom";
+import { fetchProjectsCategory } from "../../pages_services/AnnotatedImages/fetcgProjectCategory";
 
 const AnnotatedImages = () => {
   const { projectId } = useParams();
   const [projectCategory, setProjetCategory] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const fetchProjectsCategory = async () => {
-      try {
-        const response = await fetch(
-          `http://127.0.0.1:8000/project/${projectId}/categories/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch projects.");
-        }
-
-        const data = await response.json();
-        setProjetCategory(data);
-        console.log(data, "empty");
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    fetchProjectsCategory();
+    fetchProjectsCategory(projectId, setProjetCategory);
   }, [projectId]);
 
   return (
