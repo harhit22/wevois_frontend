@@ -1,3 +1,4 @@
+import URLs from "../constant/url";
 export const handleChange = (e, setEmail, setPassword) => {
   const { name, value } = e.target;
   switch (name) {
@@ -23,7 +24,7 @@ export const handleSubmit = async (
   e.preventDefault();
   const formData = { email, password };
   try {
-    const response = await fetch("http://127.0.0.1:8000/account/api/login/", {
+    const response = await fetch(`${URLs.ACCOUNT_URL}api/login/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

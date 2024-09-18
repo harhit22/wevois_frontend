@@ -1,4 +1,6 @@
 // src/utils/fileUtils.js
+import URLs from "../../constant/url";
+
 export const handleFileChange = (event, setSelectedFile, setUploadError) => {
   const file = event.target.files[0];
   if (!file) {
@@ -38,7 +40,7 @@ export const handleUpload = async (
 
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/project/upload/api/${projectId}/upload_dataset/`,
+      `${URLs.PROJECT_UPLOAD_URL}api/${projectId}/upload_dataset/`,
       {
         method: "POST",
         body: formData,
