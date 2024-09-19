@@ -1,4 +1,4 @@
-const BaseURL = "http://127.0.0.1:8000/";
+const BaseURL = "http://34.68.171.158/";
 const URLs = {
   ADMIN_URL: `${BaseURL}admin/`,
   HOME_URL: `${BaseURL}`,

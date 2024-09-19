@@ -3,11 +3,12 @@ import URLs from "../../constant/url";
 import "./CreateProject.css";
 import Navbar from "../../components/basic/navbar/navbar";
 
-const CreateProject = ({ onProjectCreated }) => {
+const CreateProject = () => {
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [inviteEmails, setInviteEmails] = useState([""]);
   const [message, setMessage] = useState("");
+  const [errorData, setErrorData] = useState({});
 
   const handleProjectNameChange = (e) => {
     setProjectName(e.target.value);
@@ -52,7 +53,16 @@ const CreateProject = ({ onProjectCreated }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create project.");
+        const errorData = await response.json();
+        // Handle server errors
+        if (response.status === 400) {
+          console.log(errorData, "no data from backend");
+          // Handle validation errors
+          setErrorData(errorData); // Set the errors from the server
+        } else {
+          throw new Error("Failed to create project.");
+        }
+        return;
       }
 
       const data = await response.json();
@@ -77,15 +87,16 @@ const CreateProject = ({ onProjectCreated }) => {
 
       if (invitationsResponse.ok) {
         setMessage("Project created and invitations sent!");
-        onProjectCreated(data); // Callback to update the project list in parent component
       } else {
-        setMessage("Failed to send invitations.");
+        const inviteErrorData = await invitationsResponse.json();
+        setMessage("Failed to send invitations. " + inviteErrorData.detail);
       }
     } catch (error) {
-      setMessage("An error occurred.");
+      setMessage("An error occurred: " + error.message);
       console.error("Error:", error);
     }
 
+    // Clear the form fields after submission
     setProjectName("");
     setProjectDescription("");
     setInviteEmails([""]);
@@ -112,6 +123,9 @@ const CreateProject = ({ onProjectCreated }) => {
                     className="form-control"
                     required
                   />
+                  {errorData[0] && (
+                    <p className="error-message">{errorData[0]}</p>
+                  )}
                 </div>
                 <div className="form-group mb-3">
                   <label htmlFor="projectDescription" className="form-label">
@@ -125,6 +139,11 @@ const CreateProject = ({ onProjectCreated }) => {
                     rows="3"
                     required
                   />
+                  {errorData.description && (
+                    <p className="error-message">
+                      {errorData.description.join(", ")}
+                    </p>
+                  )}
                 </div>
                 <div className="form-group mb-3">
                   <label className="form-label">Invite Members by Email</label>
