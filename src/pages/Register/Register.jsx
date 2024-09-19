@@ -8,6 +8,7 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -44,12 +45,20 @@ const RegisterPage = () => {
           body: JSON.stringify(formData),
         }
       );
+
       const data = await response.json();
-      console.log(data);
-      navigate("/login");
+
+      if (response.ok) {
+        // Registration successful, navigate to login
+        navigate("/login");
+      } else {
+        console.log("Error response data:", data); // Add this to inspect the error structure
+        setErrors(data); // Set errors from server response
+      }
     } catch (error) {
-      console.error("Registration error:", error); // Handle error response
+      console.error("Registration error:", error);
     }
+
     // Reset form fields after submission
     setUsername("");
     setEmail("");
@@ -73,6 +82,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               required
             />
+            {errors.username && <p className="error">{errors.username[0]}</p>}
           </div>
           <div className="form-group">
             <label htmlFor="email">Email</label>
@@ -84,6 +94,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               required
             />
+            {errors[0] && <p className="error">{errors[0]}</p>}
           </div>
           <div className="form-group">
             <label htmlFor="password1">Password</label>
