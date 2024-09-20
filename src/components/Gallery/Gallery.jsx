@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Canvas from "../canvas/canvas";
+import { BaseURL } from "../../constant/BaseUrl";
 import "./Gallery.css";
 
 const Gallery = ({ projectId }) => {
@@ -29,7 +30,7 @@ const Gallery = ({ projectId }) => {
   const fetchNextImage = useCallback(async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/project/upload/api/${projectId}/next-image/`,
+        `${BaseURL}project/upload/api/${projectId}/next-image/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -51,7 +52,7 @@ const Gallery = ({ projectId }) => {
       let response;
       if (previousImage) {
         response = await fetch(
-          `http://127.0.0.1:8000/project/upload/previous_image/${localStorage.getItem(
+          `${BaseURL}project/upload/previous_image/${localStorage.getItem(
             "user_id"
           )}/${previousImage.id}`,
           {
@@ -62,7 +63,7 @@ const Gallery = ({ projectId }) => {
         );
       } else {
         response = await fetch(
-          `http://127.0.0.1:8000/project/upload/previous_image/${localStorage.getItem(
+          `${BaseURL}project/upload/previous_image/${localStorage.getItem(
             "user_id"
           )}/`,
           {
@@ -113,7 +114,7 @@ const Gallery = ({ projectId }) => {
       await fetchNextImage();
 
       const response = await fetch(
-        `http://127.0.0.1:8000/project/upload/check_and_reassign_status/${currentImage.image_id}/`,
+        `${BaseURL}project/upload/check_and_reassign_status/${currentImage.image_id}/`,
         {
           method: "PATCH",
           headers: {

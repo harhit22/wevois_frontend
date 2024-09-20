@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Register.css";
 import Navbar from "../../components/basic/navbar/navbar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -10,6 +12,16 @@ const RegisterPage = () => {
   const [password2, setPassword2] = useState("");
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Show a toast message if redirected from project invitations
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    console.log();
+    if (params.get("message") === "register") {
+      toast.info("Please register first to accept the invitation.");
+    }
+  }, [location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -69,6 +81,7 @@ const RegisterPage = () => {
   return (
     <>
       <Navbar />
+      <ToastContainer /> {/* Toast container for notifications */}
       <div className="register-container">
         <h2>Register</h2>
         <form onSubmit={handleSubmit}>

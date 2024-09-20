@@ -4,6 +4,7 @@ import { Stage, Layer, Image, Rect, Text, Circle } from "react-konva";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CURSORSTYLES from "../../constant/cursorStyles";
+import { BaseURL } from "../../constant/BaseUrl";
 
 const Canvas = ({
   imageUrl,
@@ -55,7 +56,7 @@ const Canvas = ({
   const fetchAlreadyLabelImage = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/project/upload/api/check_already_annotated_image/${originalImageId}`,
+        `${BaseURL}project/upload/api/check_already_annotated_image/${originalImageId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -79,7 +80,7 @@ const Canvas = ({
   const fetchDatasetFiles = async (projectId, callback) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/project/label_data/api/${projectId}/labeledImage/`,
+        `${BaseURL}project/label_data/api/${projectId}/labeledImage/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -302,7 +303,7 @@ const Canvas = ({
       if (!isAnnotatedImage && filteredRectangles.length !== 0) {
         // Save the image
         const imageResponse = await fetch(
-          "http://127.0.0.1:8000/project/label_data/save_labeled_image/",
+          `${BaseURL}project/label_data/save_labeled_image/`,
           {
             method: "POST",
             headers: {
@@ -322,7 +323,7 @@ const Canvas = ({
         // Save labels for the image
         for (const rect of filteredRectangles) {
           const labelResponse = await fetch(
-            "http://127.0.0.1:8000/project/label_data/save_label_for_image/",
+            `${BaseURL}project/label_data/save_label_for_image/`,
             {
               method: "POST",
               headers: {
@@ -350,7 +351,7 @@ const Canvas = ({
       } else {
         if (isAnnotatedImage) {
           const deleteResponse = await fetch(
-            "http://127.0.0.1:8000/project/label_data/delete_existing_labels/",
+            `${BaseURL}project/label_data/delete_existing_labels/`,
             {
               method: "POST",
               headers: {
@@ -370,7 +371,7 @@ const Canvas = ({
         // Save new labels for the image
         for (const rect of filteredRectangles) {
           const labelResponse = await fetch(
-            "http://127.0.0.1:8000/project/label_data/save_label_for_image/",
+            `${BaseURL}project/label_data/save_label_for_image/`,
             {
               method: "POST",
               headers: {
@@ -399,7 +400,7 @@ const Canvas = ({
 
       // Update image status
       const updateStatusResponse = await fetch(
-        `http://127.0.0.1:8000/project/upload/update_image_status/${originalImageId}/`,
+        `${BaseURL}project/upload/update_image_status/${originalImageId}/`,
         {
           method: "PATCH",
           headers: {

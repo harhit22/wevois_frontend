@@ -17,13 +17,13 @@ const Navbar = () => {
     });
 
     if (response.ok) {
-      // Clear localStorage
+      // Clear localStorage and redirect to the home page
       localStorage.removeItem("token");
-      window.location.reload();
+      window.location.href = "/";
     } else {
-      // Handle logout failure
+      // Handle logout failure, still redirect to the home page
       localStorage.removeItem("token");
-      window.location.reload();
+      window.location.href = "/";
     }
   };
 
