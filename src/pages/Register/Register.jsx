@@ -11,13 +11,12 @@ const RegisterPage = () => {
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
   const [errors, setErrors] = useState({});
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Show a toast message if redirected from project invitations
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    console.log();
     if (params.get("message") === "register") {
       toast.info("Please register first to accept the invitation.");
     }
@@ -34,13 +33,19 @@ const RegisterPage = () => {
         break;
       case "password1":
         setPassword1(value);
+        checkPasswordsMatch(value, password2);
         break;
       case "password2":
         setPassword2(value);
+        checkPasswordsMatch(password1, value);
         break;
       default:
         break;
     }
+  };
+
+  const checkPasswordsMatch = (pwd1, pwd2) => {
+    setPasswordsMatch(pwd1 === pwd2);
   };
 
   const handleSubmit = async (e) => {
@@ -61,11 +66,10 @@ const RegisterPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Registration successful, navigate to login
         navigate("/login");
       } else {
-        console.log("Error response data:", data); // Add this to inspect the error structure
-        setErrors(data); // Set errors from server response
+        console.log("Error response data:", data);
+        setErrors(data);
       }
     } catch (error) {
       console.error("Registration error:", error);
@@ -80,59 +84,72 @@ const RegisterPage = () => {
 
   return (
     <>
-      <Navbar />
-      <ToastContainer /> {/* Toast container for notifications */}
-      <div className="register-container">
-        <h2>Register</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={username}
-              onChange={handleChange}
-              required
-            />
-            {errors.username && <p className="error">{errors.username[0]}</p>}
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={email}
-              onChange={handleChange}
-              required
-            />
-            {errors[0] && <p className="error">{errors[0]}</p>}
-          </div>
-          <div className="form-group">
-            <label htmlFor="password1">Password</label>
-            <input
-              type="password"
-              id="password1"
-              name="password1"
-              value={password1}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password2">Confirm Password</label>
-            <input
-              type="password"
-              id="password2"
-              name="password2"
-              value={password2}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <button type="submit">Register</button>
-        </form>
+      <div className="xyz">
+        <Navbar />
+        <ToastContainer />
+        <div className="register-container">
+          <h2>Register</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={username}
+                onChange={handleChange}
+                required
+              />
+              {errors.username && <p className="error">{errors.username[0]}</p>}
+            </div>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={email}
+                onChange={handleChange}
+                required
+              />
+              {errors[0] && <p className="error">{errors[0]}</p>}
+            </div>
+            <div className="form-group">
+              <label htmlFor="password1">Password</label>
+              <input
+                type="password"
+                id="password1"
+                name="password1"
+                value={password1}
+                onChange={handleChange}
+                required
+                style={{
+                  borderColor: !passwordsMatch && password2 ? "red" : "",
+                }}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password2">Confirm Password</label>
+              <input
+                type="password"
+                id="password2"
+                name="password2"
+                value={password2}
+                onChange={handleChange}
+                required
+                style={{
+                  borderColor: !passwordsMatch && password1 ? "red" : "",
+                }}
+              />
+              {!passwordsMatch && (
+                <p className="error">Passwords do not match</p>
+              )}
+            </div>
+            <button type="submit" disabled={!passwordsMatch}>
+              Register
+            </button>
+          </form>
+        </div>
       </div>
     </>
   );

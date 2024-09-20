@@ -8,6 +8,11 @@
     margin-top: 10px;
 }
 
+.xyz{
+    background: url('https://t3.ftcdn.net/jpg/05/63/05/52/360_F_563055283_HwIxm5kjs4NQJM4YIvWSH7Nk0QkNr70n.jpg') center center/cover no-repeat;
+    height: 100vh;
+}
+
 .register-container h2 {
     text-align: center;
     margin-bottom: 20px;
