@@ -48,5 +48,4 @@ export const handleSubmit = async (
     alert("An error occurred. Please try again later.");
   }
   setEmail("");
-  setPassword("");
 };
