@@ -3,14 +3,19 @@ import Navbar from "../../components/basic/navbar/navbar";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 import { handleChange, handleSubmit } from "../../utils/authutils";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Loginpage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleChangeWrapper = (e) => handleChange(e, setEmail, setPassword);
-  const handleSubmitWrapper = (e) =>
-    handleSubmit(e, email, password, navigate, setEmail, setPassword);
   const navigate = useNavigate();
+
+  const handleChangeWrapper = (e) => handleChange(e, setEmail, setPassword);
+
+  const handleSubmitWrapper = (e) => {
+    handleSubmit(e, email, password, navigate, setEmail, setPassword);
+  };
 
   return (
     <>
@@ -45,6 +50,9 @@ const Loginpage = () => {
           </form>
         </div>
       </div>
+
+      {/* Toast Container for Notifications */}
+      <ToastContainer />
     </>
   );
 };

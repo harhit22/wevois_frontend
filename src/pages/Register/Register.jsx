@@ -145,7 +145,14 @@ const RegisterPage = () => {
                 <p className="error">Passwords do not match</p>
               )}
             </div>
-            <button type="submit" disabled={!passwordsMatch}>
+            <button
+              type="submit"
+              disabled={!passwordsMatch}
+              style={{
+                backgroundColor: !passwordsMatch ? "#5DB8D2" : "",
+                cursor: !passwordsMatch ? "not-allowed" : "pointer",
+              }}
+            >
               Register
             </button>
           </form>
