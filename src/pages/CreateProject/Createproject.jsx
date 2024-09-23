@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import URLs from "../../constant/url";
 import "./CreateProject.css";
 import Navbar from "../../components/basic/navbar/navbar";
+import { useNavigate } from "react-router-dom";
 
 const CreateProject = () => {
   const [projectName, setProjectName] = useState("");
@@ -9,6 +10,7 @@ const CreateProject = () => {
   const [inviteEmails, setInviteEmails] = useState([""]);
   const [message, setMessage] = useState("");
   const [errorData, setErrorData] = useState({});
+  const navigate = useNavigate();
 
   const handleProjectNameChange = (e) => {
     setProjectName(e.target.value);
@@ -87,6 +89,7 @@ const CreateProject = () => {
 
       if (invitationsResponse.ok) {
         setMessage("Project created and invitations sent!");
+        navigate("/projectList");
       } else {
         const inviteErrorData = await invitationsResponse.json();
         setMessage("Failed to send invitations. " + inviteErrorData.detail);

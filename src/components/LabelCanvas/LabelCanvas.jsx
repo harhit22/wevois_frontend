@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { purple } from "@mui/material/colors";
 import useKeyHandler from "../../hooks/useKeyHandler";
+import { BaseURL } from "../../constant/BaseUrl";
 
 const LabelCanvas = ({
   imageUrl,
@@ -45,7 +46,7 @@ const LabelCanvas = ({
     const fetchLabels = async () => {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/categoryImage/Labels/labels/${imageid}/`,
+          `${BaseURL}categoryImage/Labels/labels/${imageid}/`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -81,7 +82,7 @@ const LabelCanvas = ({
     const get_label_image_id = async () => {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/categoryImage/get_label_image/${imageid}/${catId}/`,
+          `${BaseURL}categoryImage/get_label_image/${imageid}/${catId}/`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -189,7 +190,7 @@ const LabelCanvas = ({
 
       const token = localStorage.getItem("token");
       const imageResponse = await fetch(
-        "http://127.0.0.1:8000/categoryImageSave/save_category_labeled_image/",
+        `${BaseURL}categoryImageSave/save_category_labeled_image/`,
         {
           method: "POST",
           headers: {
@@ -210,7 +211,7 @@ const LabelCanvas = ({
       // Save each rectangle label
       for (const rect of rectangles) {
         const labelResponse = await fetch(
-          "http://127.0.0.1:8000/categoryImageSave/save_category_label_for_image/",
+          `${BaseURL}categoryImageSave/save_category_label_for_image/`,
           {
             method: "POST",
             headers: {
@@ -238,7 +239,7 @@ const LabelCanvas = ({
 
       // Update the status of the image
       const updateStatusResponse = await fetch(
-        `http://127.0.0.1:8000/categoryImage/update_category_image_status/${imageid}/`,
+        `${BaseURL}categoryImage/update_category_image_status/${imageid}/`,
         {
           method: "PATCH",
           headers: {
@@ -281,7 +282,7 @@ const LabelCanvas = ({
 
     try {
       const deleteResponse = await fetch(
-        `http://127.0.0.1:8000/categoryImage/delete_label_for_image_category/${alreadyLabelImageID}/`,
+        `${BaseURL}categoryImage/delete_label_for_image_category/${alreadyLabelImageID}/`,
         {
           method: "DELETE",
           headers: {
@@ -300,7 +301,7 @@ const LabelCanvas = ({
       // Save new labels
       for (const rect of rectangles) {
         const labelResponse = await fetch(
-          "http://127.0.0.1:8000/categoryImageSave/save_category_label_for_image/",
+          `${BaseURL}categoryImageSave/save_category_label_for_image/`,
           {
             method: "POST",
             headers: {

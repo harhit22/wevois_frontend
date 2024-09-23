@@ -3,8 +3,6 @@ import Navbar from "../../components/basic/navbar/navbar";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 import { handleChange, handleSubmit } from "../../utils/authutils";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const Loginpage = () => {
   const [email, setEmail] = useState("");
@@ -12,9 +10,11 @@ const Loginpage = () => {
   const navigate = useNavigate();
 
   const handleChangeWrapper = (e) => handleChange(e, setEmail, setPassword);
-
-  const handleSubmitWrapper = (e) => {
+  const handleSubmitWrapper = (e) =>
     handleSubmit(e, email, password, navigate, setEmail, setPassword);
+
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
   };
 
   return (
@@ -48,11 +48,13 @@ const Loginpage = () => {
             </div>
             <button type="submit">Login</button>
           </form>
+          <div className="forgot-password">
+            <button type="button" onClick={handleForgotPassword}>
+              Forgot Password?
+            </button>
+          </div>
         </div>
       </div>
-
-      {/* Toast Container for Notifications */}
-      <ToastContainer />
     </>
   );
 };

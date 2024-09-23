@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import Loader from "../ui/Loader/Loader";
+import { BaseURL } from "../../constant/BaseUrl";
 
 const LabelGallery = ({
   images,
@@ -23,7 +24,7 @@ const LabelGallery = ({
   const [showOpacity, setShowOpacity] = useState(null);
   const [currentImage, setCurrentImage] = useState(null);
   const [alreadyLabelImageID, setAlreadyLabelImageId] = useState();
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     document.body.style.cursor = cursorStyle;
@@ -34,10 +35,10 @@ const LabelGallery = ({
   }, [cursorStyle]);
 
   const fetchNextImage = useCallback(async () => {
-    setLoading(true); // Start loading when fetching the next image
+    setLoading(true);
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/categoryImage/next/${id}/${catId}/`,
+        `${BaseURL}/categoryImage/next/${id}/${catId}/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -53,7 +54,7 @@ const LabelGallery = ({
     } catch (error) {
       console.error("Error:", error);
     } finally {
-      setLoading(false); // Stop loading when the image is fetched
+      setLoading(false);
     }
   }, [id, catId]);
 
@@ -67,7 +68,7 @@ const LabelGallery = ({
       await fetchNextImage();
 
       const response = await fetch(
-        `http://127.0.0.1:8000/categoryImage/check_and_reassgin_cat_image/${currentImage.image["id"]}/`,
+        `${BaseURL}categoryImage/check_and_reassgin_cat_image/${currentImage.image["id"]}/`,
         {
           method: "PATCH",
           headers: {
@@ -135,7 +136,7 @@ const LabelGallery = ({
           id="previous"
           onClick={handlePrevious}
           className="my_button"
-          disabled={loading} // Disable button while loading
+          disabled={loading}
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </Link>
@@ -144,7 +145,7 @@ const LabelGallery = ({
           id="next"
           onClick={handleNext}
           className="my_button"
-          disabled={loading} // Disable button while loading
+          disabled={loading}
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </Link>
@@ -152,7 +153,7 @@ const LabelGallery = ({
 
       <div className="gallery-container">
         <div className="image-container">
-          {loading ? ( // Show loading indicator if loading
+          {loading ? (
             <div className="loading-screen">Loading...</div>
           ) : currentImage ? (
             <>

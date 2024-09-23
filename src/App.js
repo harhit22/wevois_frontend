@@ -9,6 +9,8 @@ import ProjectDashBoard from "./pages/ProjectDashBoard/ProjectDashBoard";
 import UnannotedImages from "./pages/UnannotedImages/UnannotedImages";
 import AnnotatedImages from "./pages/AnnotedImages/AnnotedImages";
 import LabelCategory from "./pages/LabelCategory/LabelCategory";
+import ForgotPasswordPage from "./pages/forgetPassword/forgetPassword";
+import PasswordResetPage from "./pages/PasswordResetPage/PasswordResetPage";
 
 const App = () => {
   return (
@@ -31,6 +33,11 @@ const App = () => {
         <Route
           path="/labelCategory/:catId/:category/:projectId"
           element={<LabelCategory />}
+        />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route
+          path="/reset-password/:uidb64/:token"
+          element={<PasswordResetPage />}
         />
       </Routes>
     </Router>
