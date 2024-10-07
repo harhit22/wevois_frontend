@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import "./PasswordResetPage.css";
+import { BaseURL } from "../../constant/BaseUrl";
 
 const PasswordResetPage = () => {
   const { uidb64, token } = useParams(); // Get uidb64 and token from the URL
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/account/password-reset-confirm/${uidb64}/${token}/`,
+        `${BaseURL}account/password-reset-confirm/${uidb64}/${token}/`,
         {
           method: "POST",
           headers: {
@@ -24,7 +27,7 @@ const PasswordResetPage = () => {
       }
 
       const data = await response.json();
-      alert(data.detail); // Notify the user of the result
+      navigate("/login");
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while resetting the password.");

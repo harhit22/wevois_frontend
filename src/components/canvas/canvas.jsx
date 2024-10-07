@@ -16,6 +16,7 @@ const Canvas = ({
   nextClick,
   onProcessingStart,
   onProcessingEnd,
+  loadingImage,
 }) => {
   const [image] = useImage(imageUrl);
   const [rectangles, setRectangles] = useState([]);
@@ -67,7 +68,7 @@ const Canvas = ({
         throw new Error("Failed to fetch the already annotated image.");
       }
       const data = await response.json();
-      console.log(data);
+      console.log(data, "cc");
       setIsAnnotatedImage((prevState) => {
         // Calculate the new state based on prevState
         return data;
@@ -295,8 +296,7 @@ const Canvas = ({
         throw new Error("Failed to fetch image file");
       }
       const blob = await response.blob();
-      const file = new File([blob], imageName, { type: "image/jpeg" });
-      imageData.append("image_file", file);
+      imageData.append("image_file", imageName);
 
       let image_id = null;
 
@@ -438,8 +438,22 @@ const Canvas = ({
 
   return (
     <>
-      <div>
+      <div className="image_large">
         <div>
+          {loadingImage && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                color: "black",
+                fontSize: "20px",
+              }}
+            >
+              Loading image...
+            </div>
+          )}
           <Stage
             width={Math.min(window.innerWidth, 1000)}
             height={Math.min(window.innerHeight - 30, 800)}

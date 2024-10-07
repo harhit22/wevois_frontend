@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import Canvas from "../canvas/canvas";
 import { BaseURL } from "../../constant/BaseUrl";
 import "./Gallery.css";
+import Loader from "../ui/Loader/Loader";
 
-const Gallery = ({ projectId }) => {
-  const [currentImage, setCurrentImage] = useState(null);
+const Gallery = ({ projectId, initialImage }) => {
+  const [currentImage, setCurrentImage] = useState(initialImage);
   const [labelData, setLabelData] = useState({});
   const [boxSelection, setBoxSelection] = useState(false);
   const [cursorStyle, setCursorStyle] = useState("default");
@@ -12,6 +13,7 @@ const Gallery = ({ projectId }) => {
   const [previousImage, setPreviousImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [loadingImage, setLoadingImage] = useState(true);
   const handleProcessingStart = () => {
     setIsProcessing(true);
   };
@@ -28,6 +30,7 @@ const Gallery = ({ projectId }) => {
   }, [cursorStyle]);
 
   const fetchNextImage = useCallback(async () => {
+    setLoadingImage(true);
     try {
       const response = await fetch(
         `${BaseURL}project/upload/api/${projectId}/next-image/`,
@@ -44,6 +47,8 @@ const Gallery = ({ projectId }) => {
       setCurrentImage(data);
     } catch (error) {
       console.error("Error:", error);
+    } finally {
+      setLoadingImage(false);
     }
   }, [projectId]);
 
@@ -150,39 +155,41 @@ const Gallery = ({ projectId }) => {
   };
 
   if (!currentImage) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   return (
     <>
       <div className="gallery-contain">
-        {currentImage.image_id !== undefined && (
-          <button
-            id="previous"
-            className="btn btn-primary gallery-nav-button gallery-prev-button"
-            onClick={handlePrevious}
-          >
-            &lt;
-          </button>
-        )}
-        {loading === false ? (
-          <button
-            id="next"
-            className="btn btn-primary gallery-nav-button gallery-next-button"
-            onClick={handleNext}
-            disabled={isProcessing}
-          >
-            &gt;
-          </button>
-        ) : (
-          ""
-        )}
+        <div className="nav_btnn">
+          {currentImage.image_id !== undefined && (
+            <span
+              id="previous"
+              className="gallery-nav-button gallery-prev-button"
+              onClick={handlePrevious}
+            >
+              <i class="fa fa-chevron-left"></i>
+            </span>
+          )}
+          {loading === false ? (
+            <span
+              id="next"
+              className="gallery-nav-button gallery-next-button"
+              onClick={handleNext}
+              disabled={isProcessing}
+            >
+              <i class="fa fa-chevron-right"></i>
+            </span>
+          ) : (
+            ""
+          )}
+        </div>
       </div>
-      <div className="gallery-container">
+      <div className="">
         <div className="image-container">
           {!previousImage ? (
             <Canvas
@@ -199,10 +206,11 @@ const Gallery = ({ projectId }) => {
               nextClick={"nextClick"}
               onProcessingStart={handleProcessingStart}
               onProcessingEnd={handleProcessingEnd}
+              loadingImage={loadingImage}
             />
           ) : (
             <Canvas
-              imageUrl={`${previousImage.image_file}`}
+              imageUrl={`${previousImage.firebase_url}`}
               labelData={labelData}
               onLabelChange={handleLabelChange}
               boxSelection={boxSelection}
@@ -210,6 +218,9 @@ const Gallery = ({ projectId }) => {
               showOpacity={showOpacity}
               setShowOpacity={setShowOpacity}
               originalImageId={previousImage.original_image}
+              loadingImage={loadingImage}
+              onProcessingStart={handleProcessingStart}
+              onProcessingEnd={handleProcessingEnd}
             />
           )}
         </div>

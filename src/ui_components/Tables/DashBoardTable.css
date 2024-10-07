@@ -1,0 +1,44 @@
+.table-d{
+    background-color: #196251 !important; /* Dark background for the table header */
+    color: #fff; /* White text color for the header */
+  }
+  
+  .table-dark th {
+    color: #fff; /* White text color for table headers */
+  }
+  
+  .table th, .table td {
+    vertical-align: middle; /* Center content vertically */
+  }
+  
+  .btn-warning {
+    background-color: #1b6957; /* Customize warning button color */
+    border: none; /* Remove default border */
+    color: #fff;
+  }
+  
+  .btn-danger {
+    background-color: #dc3545; /* Customize danger button color */
+    border: none; /* Remove default border */
+  }
+  
+  .btn-sm {
+    font-size: 0.875rem; /* Smaller font size for buttons */
+  }
+  
+  .btn-sm.me-2 {
+    margin-right: 0.5rem; /* Add margin between buttons */
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f1f1f1; /* Light background on hover */
+  }
+  
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9; /* Stripe color for odd rows */
+  }
+
+  .table{
+    border-radius: 5px;
+  }
+  

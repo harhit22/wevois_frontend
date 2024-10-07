@@ -105,7 +105,7 @@ const LabelCanvas = ({
   const get_label_image_id = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/categoryImage/get_label_image/${imageid}/${catId}/`,
+        `${BaseURL}categoryImage/get_label_image/${imageid}/${catId}/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -239,7 +239,7 @@ const LabelCanvas = ({
 
       // Update the status of the image
       const updateStatusResponse = await fetch(
-        `${BaseURL}categoryImage/update_category_image_status/${imageid}/`,
+        `${BaseURL}categoryImage/update_category_image_status/${imageid}/${catId}`,
         {
           method: "PATCH",
           headers: {

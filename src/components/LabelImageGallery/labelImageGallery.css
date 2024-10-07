@@ -1,0 +1,176 @@
+/* Image gallery styling */
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: left; /* Center the thumbnails */
+  }
+  
+  /* Thumbnail styling */
+  .thumbnail {
+    width: 160px; /* Adjust size as needed */
+    height: 160px; /* Adjust size as needed */
+    margin: 5px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  /* Hover effect on thumbnails */
+  .thumbnail:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+  
+  .thumbnail img:hover {
+    transform: scale(1.08);
+  }
+  
+  /* Label box styling */
+  .label-box {
+    position: absolute;
+    border: 2px solid #ff4d4d; /* Red border for better visibility */
+    box-sizing: border-box;
+    background: rgba(255, 77, 77, 0.2); /* Light background color for visibility */
+    pointer-events: none; /* Prevents interaction with the label box */
+  }
+  
+  .label {
+    position: absolute;
+    border: 1px solid white;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background for better readability */
+    color: white;
+    font-size: 12px;
+    padding: 2px;
+    text-align: center;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Username display styling */
+  .m-2 {
+    text-align: center;
+    font-size: 14px;
+    color: #22806a; /* Green color for emphasis */
+    margin-top: 10px;
+    font-weight: bold;
+    text-transform: capitalize; 
+  }
+  
+  /* Add a subtle background to the username container */
+  .m-2::before {
+    content: "";
+    color: #555;
+    font-weight: normal;
+  }
+  
+  /* Pagination container */
+  .pagination {
+    display: flex;
+    justify-content: left;
+    margin-top: 20px;
+  }
+  
+  /* Pagination buttons */
+  .btn-pagination {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-pagination.active {
+    background-color: #0056b3;
+    color: white;
+  }
+  
+  .btn-pagination:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Filter container */
+  .filter-container {
+    display: flex;
+    justify-content: left;
+    margin: 20px;
+  }
+  
+  .filter-container input {
+    width: 300px;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .filter-container input::placeholder {
+    color: black;
+  }
+  
+  .filter-container input:focus {
+    border-color: #007bff;
+  }
+  
+  /* Loading text */
+  .loading {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+  }
+  
+  
+  .card {
+    border: 1px solid #ddd; /* Card border */
+    border-radius: 0.5rem; /* Rounded corners */
+    overflow: hidden; /* Ensure child elements don't overflow */
+    margin: 0;
+  }
+  
+  .card-body {
+    padding: 1rem; /* Padding inside card body */
+  }
+  
+  
+  /* Category Filter Styling */
+  .filter-container {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  
+  .filter-container label {
+    margin-right: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .filter-container select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .filter-container select:focus {
+    border-color: #007bff;
+  }
+  

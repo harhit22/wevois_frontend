@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../../components/basic/navbar/navbar";
 import "./Login.css";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { handleChange, handleSubmit } from "../../utils/authutils";
 
 const Loginpage = () => {
@@ -47,12 +47,12 @@ const Loginpage = () => {
               />
             </div>
             <button type="submit">Login</button>
+            <div className="forgot-password p-2">
+              <NavLink to="/forgot-password" className="forget-password">
+                Forgot Password?
+              </NavLink>
+            </div>
           </form>
-          <div className="forgot-password">
-            <button type="button" onClick={handleForgotPassword}>
-              Forgot Password?
-            </button>
-          </div>
         </div>
       </div>
     </>

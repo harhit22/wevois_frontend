@@ -3,12 +3,21 @@
     justify-content: center;
     align-items: center;
     height: 100vh; /* Full height of the viewport */
+    
   }
+
+  .xyz{
+    background: url('https://t3.ftcdn.net/jpg/05/63/05/52/360_F_563055283_HwIxm5kjs4NQJM4YIvWSH7Nk0QkNr70n.jpg') center center/cover no-repeat;
+    height: 100vh;
+}
+
   
   .card_center {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: #f9f9f9;
+    border-radius: 10px;
   }
   
   .card_create_project {
@@ -20,3 +29,118 @@
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25); /* More realistic shadow */
   }
   
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  /* Form Inputs */
+  .form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: all 0.3s ease-in-out;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+  }
+  
+  .form-control:focus {
+    border-color: #3949ab; /* Highlight with blue on focus */
+    box-shadow: 0 0 5px rgba(57, 73, 171, 0.2);
+    outline: none;
+  }
+  
+  /* Textarea specific adjustments */
+  textarea.form-control {
+    resize: vertical;
+  }
+  
+  /* Email Input Group */
+  .input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .input-group .btn {
+    margin-left: 10px;
+  }
+  
+  /* Error and Success Messages */
+  .error-message {
+    color: #d32f2f;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  
+  .alert-info {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    font-size: 0.95rem;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 6px;
+  }
+  
+  /* Button Styling */
+  .btn {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .btn-primary {
+    background-color: #1a237e;
+    color: white;
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background-color: #3949ab;
+    color: white;
+  }
+  
+  .btn-outline-secondary {
+    background-color: #3946d4;;
+    border: 2px solid #1a237e;
+    color: #d3d3d3;
+  }
+  
+  .btn-outline-secondary:hover {
+    background-color: #1a237e;
+    color: white !important; 
+  }
+  
+  .btn-outline-danger {
+    background-color: #d32f2f;
+    border: 2px solid #e45656;
+    color: #f9f9f9;
+  }
+  
+  .btn-outline-danger:hover {
+    background-color: #791919;
+    color: white;
+  }
+  
+  /* Responsive Enhancements */
+  @media (max-width: 768px) {
+    .form-control {
+      font-size: 0.9rem;
+    }
+  
+    .btn {
+      font-size: 0.9rem;
+    }
+  }

@@ -23,6 +23,5 @@ export const fetchProjectsCategory = async (
     setProjetCategory(data);
   } catch (error) {
     console.error("Error:", error);
-    setError(error.message);
   }
 };

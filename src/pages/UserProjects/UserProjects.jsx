@@ -4,6 +4,7 @@ import "./UserProject.css";
 import Navbar from "../../components/basic/navbar/navbar";
 import fetchProjects from "../../pages_services/UserProjects/FetchProjects/FetchProjects";
 import URLs from "../../constant/url";
+import { useNavigate } from "react-router-dom";
 
 const ProjectList = () => {
   const [projects, setProjects] = useState([]);
@@ -11,6 +12,16 @@ const ProjectList = () => {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteError, setInviteError] = useState("");
   const [inviteSuccess, setInviteSuccess] = useState("");
+
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  useEffect(() => {
+    // Check for token and redirect to login if not found
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login"); // Redirect to login page if no token is found
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const getProjects = async () => {

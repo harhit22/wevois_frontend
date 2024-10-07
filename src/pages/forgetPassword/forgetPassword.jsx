@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import "./forgetPassword.css";
+import Navbar from "../../components/basic/navbar/navbar";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -29,22 +31,27 @@ const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="forgot-password-container">
-      <h2>Forgot Password</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <>
+      <Navbar />
+      <div className="xyz">
+        <div className="forgot-password-container">
+          <h2>Forgot Password</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit">Send Reset Link</button>
+          </form>
         </div>
-        <button type="submit">Send Reset Link</button>
-      </form>
-    </div>
+      </div>
+    </>
   );
 };
 

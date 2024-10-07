@@ -3,10 +3,20 @@ import Navbar from "../../components/basic/navbar/navbar";
 import { useParams } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { fetchProjectsCategory } from "../../pages_services/AnnotatedImages/fetcgProjectCategory";
+import { useNavigate } from "react-router-dom";
 
 const AnnotatedImages = () => {
   const { projectId } = useParams();
   const [projectCategory, setProjetCategory] = useState([]);
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  useEffect(() => {
+    // Check for token and redirect to login if not found
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login"); // Redirect to login page if no token is found
+    }
+  }, [navigate]);
 
   useEffect(() => {
     fetchProjectsCategory(projectId, setProjetCategory);

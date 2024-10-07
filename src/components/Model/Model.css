@@ -1,0 +1,42 @@
+/* Modal.css */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 80%; /* Limit width to 80% of the viewport */
+    max-height: 80%; /* Limit height to 80% of the viewport */
+    overflow: auto; /* Add scrolling if content is too large */
+    position: relative;
+    display: flex;
+    flex-direction: column; /* Ensure children stack vertically */
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1001; /* Ensure it's above modal content */
+}
+
+img {
+    max-width: 100%; /* Ensure images are responsive */
+    max-height: 60vh; /* Limit image height to prevent overflow */
+    object-fit: contain; /* Maintain aspect ratio */
+}

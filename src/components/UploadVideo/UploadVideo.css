@@ -1,0 +1,26 @@
+/* UploadDatasetForm.css */
+.upload-main-div {
+    max-width: 600px;
+    
+  }
+  
+  .card {
+    border-radius: 10px;
+    padding: 20px;
+    margin: 0 auto;
+  }
+  
+  .card-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .form-control {
+    padding: 10px;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  

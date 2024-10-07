@@ -1,0 +1,33 @@
+.red-check-button {
+    background-color: #8e2626; /* Green background */
+    color: white; /* White text */
+    width: 35px; /* Fixed width */
+    height: 35px; /* Fixed height */
+    border: none; /* Remove default border */
+    border-radius: 50%; /* Fully rounded */
+    font-size: 20px; /* Font size for the checkmark */
+    cursor: pointer; /* Pointer cursor on hover */
+    display: inline-flex; /* Align checkmark with text */
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    transition: background-color 0.3s ease; 
+    text-align: center; /* Center text */
+    padding: 0; /* Remove padding to maintain circular shape */
+  }
+  
+  /* Hover effect for the button */
+  .red-check-button:hover {
+    background-color: #882121; /* Darker green on hover */
+  }
+  
+  /* Size of the checkmark */
+  .checkmark {
+    font-size: 20px; /* Adjust based on the button size */
+  }
+  
+  /* Add focus outline for accessibility */
+  .red-check-button:focus {
+    outline: 3px solid #80e98a;
+    outline-offset: 2px; /* Optional: Add space between button and outline */
+  }
+  

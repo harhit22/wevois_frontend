@@ -3,7 +3,7 @@ import LabelCanvas from "../LabelCanvas/LabelCanvas";
 import "./LabelGallery.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Loader from "../ui/Loader/Loader";
 import { BaseURL } from "../../constant/BaseUrl";
 
@@ -25,6 +25,15 @@ const LabelGallery = ({
   const [currentImage, setCurrentImage] = useState(null);
   const [alreadyLabelImageID, setAlreadyLabelImageId] = useState();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check for token and redirect to login if not found
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login"); // Redirect to login page if no token is found
+    }
+  }, [navigate]);
 
   useEffect(() => {
     document.body.style.cursor = cursorStyle;
@@ -38,7 +47,7 @@ const LabelGallery = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `${BaseURL}/categoryImage/next/${id}/${catId}/`,
+        `${BaseURL}categoryImage/next/${id}/${catId}/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -131,24 +140,26 @@ const LabelGallery = ({
   return (
     <>
       <div className="gallery-contain">
-        <Link
-          to="#"
-          id="previous"
-          onClick={handlePrevious}
-          className="my_button"
-          disabled={loading}
-        >
-          <FontAwesomeIcon icon={faArrowLeft} />
-        </Link>
-        <Link
-          to="#"
-          id="next"
-          onClick={handleNext}
-          className="my_button"
-          disabled={loading}
-        >
-          <FontAwesomeIcon icon={faArrowRight} />
-        </Link>
+        <div className="nav_btnn">
+          <span
+            to="#"
+            id="previous"
+            onClick={handlePrevious}
+            className="gallery-nav-button gallery-prev-button"
+            disabled={loading}
+          >
+            <i class="fa fa-chevron-left"></i>
+          </span>
+          <span
+            to="#"
+            id="next"
+            onClick={handleNext}
+            className="gallery-nav-button gallery-prev-button"
+            disabled={loading}
+          >
+            <i class="fa fa-chevron-right"></i>
+          </span>
+        </div>
       </div>
 
       <div className="gallery-container">

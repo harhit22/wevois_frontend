@@ -3,6 +3,7 @@ import Navbar from "../../components/basic/navbar/navbar";
 import { useParams } from "react-router-dom";
 import LabelGallery from "../../components/LabelGallary/LabelGallery";
 import "./LabelCategory.css";
+import { BaseURL } from "../../constant/BaseUrl";
 
 const LabelCategory = () => {
   const { projectId, catId, category } = useParams();
@@ -19,7 +20,7 @@ const LabelCategory = () => {
     const fetchNextImage = async () => {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/categoryImage/next/${projectId}/${catId}/`,
+          `${BaseURL}categoryImage/next/${projectId}/${catId}/`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -44,7 +45,7 @@ const LabelCategory = () => {
     const categories_data = async () => {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/project/${catId}/${category}/categories_data/`,
+          `${BaseURL}project/${catId}/${category}/categories_data/`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -85,6 +86,7 @@ const LabelCategory = () => {
 
                 <br />
                 <hr />
+
                 {labelList.map((label, index) => (
                   <li
                     key={index}
@@ -94,7 +96,44 @@ const LabelCategory = () => {
                     onClick={() => handleLabelClick(label)}
                   >
                     <p>
-                      {label[0]}: {label}
+                      {
+                        category === "Material"
+                          ? label === "PET"
+                            ? "E"
+                            : label === "LDPE"
+                            ? "L"
+                            : label === "Raffia"
+                            ? "F"
+                            : label === "HDPE"
+                            ? "H"
+                            : label === "PVC"
+                            ? "V"
+                            : label === "PP"
+                            ? "P"
+                            : label === "MLP"
+                            ? "M"
+                            : label === "Thermacol"
+                            ? "T"
+                            : label === "Rubber"
+                            ? "R"
+                            : label === "Tyre"
+                            ? "Y"
+                            : label === "Paper"
+                            ? "A"
+                            : label === "Cardboard"
+                            ? "C"
+                            : label === "Metal"
+                            ? "Q"
+                            : label === "E-waste"
+                            ? "W"
+                            : label === "Glass"
+                            ? "G"
+                            : label === "Textile"
+                            ? "X"
+                            : label // Fallback to label if no match
+                          : label[0] // Use first letter for other categories
+                      }
+                      : {label}
                     </p>
                   </li>
                 ))}

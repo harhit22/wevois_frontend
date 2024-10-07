@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import "./ProjectDashBoard.css";
 import Navbar from "../../components/basic/navbar/navbar";
@@ -9,10 +9,25 @@ import {
   BsFileEarmarkSlidesFill,
 } from "react-icons/bs";
 import UploadDatasetForm from "../uploadData/uploadData";
+import { useNavigate } from "react-router-dom";
+import UploadImage from "../../components/UploadImage/UploadImage";
+import OriginalImageGallery from "../../components/OriginalImageGallery/OriginalImageGallery";
+import LabelImageGallery from "../../components/LabelImageGallery/LabelImageGallery";
+import AnnotedImageGallery from "../../components/AnnotedImageGallery/AnnotedImageGallery";
+import UploadVideo from "../../components/UploadVideo/UploadVideo";
 
 const ProjectDashBoard = () => {
   const { projectId } = useParams();
   const [selectedSidebarItem, setSelectedSidebarItem] = useState(null);
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  useEffect(() => {
+    // Check for token and redirect to login if not found
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login"); // Redirect to login page if no token is found
+    }
+  }, [navigate]);
 
   const handleSidebarItemClick = (item) => {
     setSelectedSidebarItem(item);
@@ -56,26 +71,60 @@ const ProjectDashBoard = () => {
                   <BsUpload className="sidebar-icon" /> Upload Data
                 </NavLink>
               </li>
+
               <li className="nav-item">
                 <NavLink
-                  to={`/ProjectDetails/Labels`}
                   className={`nav-link ${
-                    selectedSidebarItem === "Labels" ? "active" : ""
+                    selectedSidebarItem === "UploadImage" ? "active" : ""
                   }`}
+                  onClick={() => handleSidebarItemClick("UploadImage")}
                 >
-                  <BsFileEarmarkSlidesFill className="sidebar-icon" /> L&A
-                  IMAGES
+                  <BsImage className="sidebar-icon" /> Upload Image
                 </NavLink>
               </li>
+
               <li className="nav-item">
                 <NavLink
-                  to={`/ProjectDetails/Labels`}
                   className={`nav-link ${
-                    selectedSidebarItem === "Labels" ? "active" : ""
+                    selectedSidebarItem === "UploadVideo" ? "active" : ""
                   }`}
-                  onClick={() => handleSidebarItemClick("Labels")}
+                  onClick={() => handleSidebarItemClick("UploadVideo")}
                 >
-                  <BsTag className="sidebar-icon" /> Labels
+                  <BsImage className="sidebar-icon" /> Upload Video
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink
+                  className={`nav-link ${
+                    selectedSidebarItem === "Original Images" ? "active" : ""
+                  }`}
+                  onClick={() => handleSidebarItemClick("Original Images")}
+                >
+                  <BsFileEarmarkSlidesFill className="sidebar-icon" /> Original
+                  Images
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink
+                  className={`nav-link ${
+                    selectedSidebarItem === "Annotated Images" ? "active" : ""
+                  }`}
+                  onClick={() => handleSidebarItemClick("Annotated Images")}
+                >
+                  <BsTag className="sidebar-icon" /> Annotated Images
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink
+                  className={`nav-link ${
+                    selectedSidebarItem === "Labeled Images" ? "active" : ""
+                  }`}
+                  onClick={() => handleSidebarItemClick("Labeled Images")}
+                >
+                  <BsUpload className="sidebar-icon" /> Labeled Images
                 </NavLink>
               </li>
             </ul>
@@ -132,6 +181,52 @@ const ProjectDashBoard = () => {
             {selectedSidebarItem === "UploadData" && (
               <>
                 <UploadDatasetForm />
+              </>
+            )}
+          </div>
+
+          <div className="row">
+            {selectedSidebarItem === "UploadImage" && (
+              <>
+                <UploadImage />
+              </>
+            )}
+          </div>
+
+          <div className="row">
+            {selectedSidebarItem === "UploadVideo" && (
+              <>
+                <UploadVideo />
+              </>
+            )}
+          </div>
+
+          <div className="row">
+            {selectedSidebarItem === "Original Images" && (
+              <>
+                <OriginalImageGallery path="all-images" />
+              </>
+            )}
+          </div>
+
+          <div className="row">
+            {selectedSidebarItem === "Annotated Images" && (
+              <>
+                <AnnotedImageGallery
+                  path="annotated-images"
+                  projectId={projectId}
+                />
+              </>
+            )}
+          </div>
+
+          <div className="row">
+            {selectedSidebarItem === "Labeled Images" && (
+              <>
+                <LabelImageGallery
+                  path="labeled-images"
+                  projectId={projectId}
+                />
               </>
             )}
           </div>
