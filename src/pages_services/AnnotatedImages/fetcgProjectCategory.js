@@ -1,4 +1,5 @@
 // src/api/fetchProjectsCategory.js
+import { BaseURL } from "../../constant/BaseUrl";
 export const fetchProjectsCategory = async (
   projectId,
   setProjetCategory,
@@ -6,14 +7,11 @@ export const fetchProjectsCategory = async (
 ) => {
   const token = localStorage.getItem("token");
   try {
-    const response = await fetch(
-      `http://127.0.0.1:8000/project/${projectId}/categories/`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${BaseURL}project/${projectId}/categories/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Failed to fetch projects.");

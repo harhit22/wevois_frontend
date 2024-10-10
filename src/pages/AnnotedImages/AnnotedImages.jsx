@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../components/basic/navbar/navbar";
-import { useParams } from "react-router-dom";
-import { NavLink } from "react-router-dom";
+import { useParams, NavLink, useNavigate } from "react-router-dom";
 import { fetchProjectsCategory } from "../../pages_services/AnnotatedImages/fetcgProjectCategory";
-import { useNavigate } from "react-router-dom";
+import { BaseURL } from "../../constant/BaseUrl";
 
 const AnnotatedImages = () => {
   const { projectId } = useParams();
-  const [projectCategory, setProjetCategory] = useState([]);
+  const [projectCategory, setProjectCategory] = useState([]);
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
@@ -19,8 +18,43 @@ const AnnotatedImages = () => {
   }, [navigate]);
 
   useEffect(() => {
-    fetchProjectsCategory(projectId, setProjetCategory);
+    fetchProjectsCategory(projectId, setProjectCategory);
   }, [projectId]);
+
+  const downloadDataset = async (categoryId, categoryName) => {
+    console.log(categoryId, categoryName);
+    try {
+      // Construct the URL with query parameters
+      const url = new URL(`${BaseURL}project/yolov8/download-dataset/`);
+      url.searchParams.append("category_id", categoryId);
+      url.searchParams.append("category_name", categoryName);
+
+      const response = await fetch(url.toString(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Handle blob download
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.setAttribute("download", `${categoryName}_dataset.zip`); // Use category name in the filename
+      document.body.appendChild(link);
+      link.click();
+      link.remove(); // Clean up
+    } catch (error) {
+      console.error("Error downloading dataset:", error);
+      alert("Failed to download dataset. Please try again."); // User feedback for errors
+    }
+  };
 
   return (
     <>
@@ -29,7 +63,7 @@ const AnnotatedImages = () => {
         <div className="row dash_back">
           <nav className="col-md-2 d-none d-md-block sidebar_background sidebar sidebar-category">
             <div className="sidebar-sticky">
-              <h5 className="sidebar-heading ">Projects</h5>
+              <h5 className="sidebar-heading">Projects</h5>
               <ul className="nav flex-column">
                 <li>
                   <img
@@ -48,13 +82,22 @@ const AnnotatedImages = () => {
             <div className="row">
               {projectCategory.map((cat) => (
                 <div className="col-lg-4 col-md-6 mb-4 mt-2" key={cat.id}>
-                  <div className="card h-100">
+                  <div className="card h-100 position-relative">
+                    {/* Download button in top-right corner */}
+                    <button
+                      className="btn btn-outline-primary position-absolute top-0 end-0 mt-2 me-2"
+                      onClick={() => downloadDataset(cat.id, cat.category)}
+                    >
+                      <i className="fa fa-download"></i>{" "}
+                      {/* Font Awesome download icon */}
+                    </button>
+
                     <div className="card-body">
                       <h5 className="card-title">{cat.category}</h5>
                       <hr />
                       <p className="card-text">
-                        Here you can view and Label images for {cat.category}{" "}
-                        category.
+                        Here you can view and label images for the{" "}
+                        {cat.category} category.
                       </p>
                       <NavLink
                         className="btn btn-primary"

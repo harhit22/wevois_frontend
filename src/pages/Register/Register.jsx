@@ -4,6 +4,7 @@ import Navbar from "../../components/basic/navbar/navbar";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BaseURL } from "../../constant/BaseUrl";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -52,16 +53,13 @@ const RegisterPage = () => {
     e.preventDefault();
     const formData = { username, email, password1, password2 };
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/account/api/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${BaseURL}account/api/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       const data = await response.json();
 

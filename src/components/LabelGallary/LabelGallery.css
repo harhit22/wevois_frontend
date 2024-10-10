@@ -147,3 +147,8 @@ ul.img_sec {
     color: white;
   }
   
+  
+  .disabled {
+    pointer-events: none;
+    opacity: 0.5; /* Grays out the button */
+  }

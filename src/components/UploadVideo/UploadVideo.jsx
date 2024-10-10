@@ -37,7 +37,7 @@ const UploadVideo = () => {
     try {
       // Call the backend API to upload video
       const response = await fetch(
-        `${BaseURL}project/upload/api/${projectId}/upload_video/`, // Update the URL as needed
+        `${BaseURL}project/upload/api/${projectId}/upload_video/`,
         {
           method: "POST",
           body: formData,

@@ -14,6 +14,7 @@ const Gallery = ({ projectId, initialImage }) => {
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [loadingImage, setLoadingImage] = useState(true);
+  const [disabled, setDisable] = useState(true);
   const handleProcessingStart = () => {
     setIsProcessing(true);
   };
@@ -30,6 +31,7 @@ const Gallery = ({ projectId, initialImage }) => {
   }, [cursorStyle]);
 
   const fetchNextImage = useCallback(async () => {
+    setDisable(true);
     setLoadingImage(true);
     try {
       const response = await fetch(
@@ -178,11 +180,12 @@ const Gallery = ({ projectId, initialImage }) => {
           {loading === false ? (
             <span
               id="next"
-              className="gallery-nav-button gallery-next-button"
-              onClick={handleNext}
-              disabled={isProcessing}
+              className={`gallery-nav-button gallery-next-button ${
+                disabled ? "disabled" : ""
+              }`}
+              onClick={!disabled || isProcessing ? handleNext : null}
             >
-              <i class="fa fa-chevron-right"></i>
+              <i className="fa fa-chevron-right"></i>
             </span>
           ) : (
             ""
@@ -207,6 +210,7 @@ const Gallery = ({ projectId, initialImage }) => {
               onProcessingStart={handleProcessingStart}
               onProcessingEnd={handleProcessingEnd}
               loadingImage={loadingImage}
+              setDisable={setDisable}
             />
           ) : (
             <Canvas
@@ -221,6 +225,7 @@ const Gallery = ({ projectId, initialImage }) => {
               loadingImage={loadingImage}
               onProcessingStart={handleProcessingStart}
               onProcessingEnd={handleProcessingEnd}
+              setDisable={setDisable}
             />
           )}
         </div>

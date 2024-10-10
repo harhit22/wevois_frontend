@@ -17,6 +17,7 @@ const Canvas = ({
   onProcessingStart,
   onProcessingEnd,
   loadingImage,
+  setDisable,
 }) => {
   const [image] = useImage(imageUrl);
   const [rectangles, setRectangles] = useState([]);
@@ -434,6 +435,7 @@ const Canvas = ({
     onProcessingEnd();
     setIsSaving(false);
     fetchAlreadyLabelImage();
+    setDisable(false);
   };
 
   return (
