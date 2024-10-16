@@ -4,11 +4,9 @@ import "./Loader.css";
 const Loader = () => {
   return (
     <div className="loader-container">
-      <div className="spinner">
-        <div className="dot dot1"></div>
-        <div className="dot dot2"></div>
-        <div className="dot dot3"></div>
-        <div className="dot dot4"></div>
+      <div className="loader">
+        <div className="ring"></div>
+        <div className="dot"></div>
       </div>
     </div>
   );

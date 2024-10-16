@@ -192,7 +192,7 @@ const Gallery = ({ projectId, initialImage }) => {
           )}
         </div>
       </div>
-      <div className="">
+      <>
         <div className="image-container">
           {!previousImage ? (
             <Canvas
@@ -228,26 +228,26 @@ const Gallery = ({ projectId, initialImage }) => {
               setDisable={setDisable}
             />
           )}
+          <div className="sidebar-controls">
+            <button
+              onClick={handleBoxSelection}
+              className={`my_button btn ${
+                boxSelection ? "green-background-select" : ""
+              }`}
+            >
+              ✋
+            </button>
+            <button
+              onClick={handledrawSelection}
+              className={`my_button btn ${
+                !boxSelection ? "green-background-draw" : ""
+              }`}
+            >
+              🧹
+            </button>
+          </div>
         </div>
-        <div className="sidebar-controls">
-          <button
-            onClick={handleBoxSelection}
-            className={`my_button btn ${
-              boxSelection ? "green-background-select" : ""
-            }`}
-          >
-            ✋
-          </button>
-          <button
-            onClick={handledrawSelection}
-            className={`my_button btn ${
-              !boxSelection ? "green-background-draw" : ""
-            }`}
-          >
-            🧹
-          </button>
-        </div>
-      </div>
+      </>
     </>
   );
 };

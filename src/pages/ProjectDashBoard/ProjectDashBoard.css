@@ -10,7 +10,7 @@
     background-color: #FFF !important;
     border: 1px solid black;
     width: 200px; 
-    height: 95vh;
+    height: 100vh;
     border-radius: 10px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);}
   
@@ -74,7 +74,7 @@
     background-color: #1b682b !important;
     color: #fff;
   }
-/* UserProject.css */
+
 
 .nav-item {
   padding: 10px 15px;
@@ -97,3 +97,4 @@
   background-color: rgba(11, 40, 3, 0.7) !important;
   color: #ffffff;
 }
+

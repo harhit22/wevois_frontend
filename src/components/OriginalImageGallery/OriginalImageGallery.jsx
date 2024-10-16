@@ -9,6 +9,8 @@ const OriginalImageGallery = ({ path, projectId }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [selectedImage, setSelectedImage] = useState(null); // Selected image for modal
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -45,39 +47,39 @@ const OriginalImageGallery = ({ path, projectId }) => {
 
   const generatePageNumbers = () => {
     const pages = [];
-    const maxPagesToShow = 5; // Maximum number of pages to show (excluding ellipses)
+    const maxPagesToShow = 5;
 
     if (totalPages <= maxPagesToShow) {
-      // If total pages are less than or equal to the max, show all
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Add first page
       pages.push(1);
-
-      // Add ellipsis if necessary
       if (currentPage > 3) {
         pages.push("...");
       }
-
-      // Add current page and surrounding pages
       const startPage = Math.max(2, currentPage - 1);
       const endPage = Math.min(totalPages - 1, currentPage + 1);
       for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
-
-      // Add ellipsis if necessary
       if (currentPage < totalPages - 2) {
         pages.push("...");
       }
-
-      // Add last page
       pages.push(totalPages);
     }
 
     return pages;
+  };
+
+  const openModal = (image) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
   };
 
   if (loading) {
@@ -89,7 +91,7 @@ const OriginalImageGallery = ({ path, projectId }) => {
       {/* Image Gallery */}
       <div className="image-gallery">
         {images.map((image) => (
-          <div className="card" key={image.id}>
+          <div className="card" key={image.id} onClick={() => openModal(image)}>
             <div>
               <div className="thumbnail">
                 <img src={image.firebase_url} alt={image.filename} />
@@ -134,6 +136,23 @@ const OriginalImageGallery = ({ path, projectId }) => {
           </button>
         )}
       </div>
+
+      {/* Modal */}
+      {isModalOpen && selectedImage && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <span className="modal-close" onClick={closeModal}>
+              &times;
+            </span>
+            <img
+              src={selectedImage.firebase_url}
+              alt={selectedImage.filename}
+              className="modal-image"
+            />
+            <p>{selectedImage.filename}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

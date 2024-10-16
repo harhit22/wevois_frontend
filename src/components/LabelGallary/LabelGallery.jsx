@@ -26,6 +26,7 @@ const LabelGallery = ({
   const [alreadyLabelImageID, setAlreadyLabelImageId] = useState();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [selectedRectIndex, setSelectedRectIndex] = useState(null);
 
   useEffect(() => {
     // Check for token and redirect to login if not found
@@ -44,6 +45,7 @@ const LabelGallery = ({
   }, [cursorStyle]);
 
   const fetchNextImage = useCallback(async () => {
+    setSelectedRectIndex(0);
     setLoading(true);
     try {
       const response = await fetch(
@@ -185,6 +187,8 @@ const LabelGallery = ({
                 catId={catId}
                 alreadyLabelImageID={alreadyLabelImageID}
                 setAlreadyLabelImageId={setAlreadyLabelImageId}
+                setSelectedRectIndex={setSelectedRectIndex}
+                selectedRectIndex={selectedRectIndex}
               />
             </>
           ) : (

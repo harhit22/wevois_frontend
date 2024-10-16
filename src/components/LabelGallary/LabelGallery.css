@@ -123,6 +123,7 @@ ul.img_sec {
     background-color: #d4eeda;
     border-radius: 10px;
     padding: 20px 5px 20px 5px;
+    display: block;
   }
   
   .my_button {

@@ -82,7 +82,7 @@
 }
 
 .nav-item:last-child {
-  border-bottom: none; /* Remove bottom border for the last navItem */
+  border-bottom: none; 
 }
 
 .nav-link {

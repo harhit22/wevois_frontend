@@ -20,10 +20,12 @@ const LabelCanvas = ({
   projectId,
   setAlreadyLabelImageId,
   alreadyLabelImageID,
+  setSelectedRectIndex,
+  selectedRectIndex,
 }) => {
   const [image] = useImage(imageUrl);
   const [rectangles, setRectangles] = useState([]);
-  const [selectedRectIndex, setSelectedRectIndex] = useState(null);
+
   // eslint-disable-next-line
   const [cursorStyle] = useState("default");
 
@@ -239,7 +241,7 @@ const LabelCanvas = ({
 
       // Update the status of the image
       const updateStatusResponse = await fetch(
-        `${BaseURL}categoryImage/update_category_image_status/${imageid}/${catId}`,
+        `${BaseURL}categoryImage/update_category_image_status/${imageid}/${catId}/`,
         {
           method: "PATCH",
           headers: {
@@ -357,7 +359,7 @@ const LabelCanvas = ({
         <div>
           <Stage
             width={Math.min(window.innerWidth, 1000)}
-            height={Math.min(window.innerHeight - 30, 800)}
+            height={Math.min(window.innerHeight - 30, 900)}
             onMouseDown={handleMouseDown}
           >
             <Layer>
