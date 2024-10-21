@@ -31,6 +31,7 @@ const LabelImageGallery = ({ path, projectId }) => {
             }
           );
           const data = await response.json();
+          console.log(data, "category data");
           setCategories(data);
         } catch (error) {
           console.error("Error fetching categories:", error);

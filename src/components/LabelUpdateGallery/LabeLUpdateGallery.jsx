@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import LabelCanvas from "../LabelCanvas/LabelCanvas";
 import "./LabelUpdateGallery.css";
 import { useNavigate } from "react-router-dom";
 import Loader from "../ui/Loader/Loader";
