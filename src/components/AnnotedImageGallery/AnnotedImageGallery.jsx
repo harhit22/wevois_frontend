@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import "./AnnotedImageGallery.css";
 import Loader from "../../ui_components/Loader/Loader";
 import { BaseURL } from "../../constant/BaseUrl";
-import Gallery from "../Gallery/Gallery";
 import Modal from "../Model/Model";
 import AnnotedUpdateGallery from "../AnnotedUpdateGallery/AnnotedUpdateGallery";
 
@@ -13,9 +12,7 @@ const AnnotedImageGallery = ({ path, projectId }) => {
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedLabelData, setSelectedLabelData] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-
-  // Track when the gallery should refresh
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [refreshGallery, setRefreshGallery] = useState(false);
 
   const fetchImages = async () => {

@@ -35,7 +35,12 @@ const useKeyHandler = (
         setRectangles((rects) =>
           rects.map((rect, index) =>
             index === selectedRectIndex
-              ? { ...rect, name: newLabel, color: labelColors[newLabel] }
+              ? {
+                  ...rect,
+                  name: newLabel,
+                  label: newLabel,
+                  color: labelColors[newLabel],
+                }
               : rect
           )
         );
@@ -53,6 +58,7 @@ const useKeyHandler = (
             setIsSaving(true); // Start the save process
 
             try {
+              alert(alreadyLabelImageID);
               if (alreadyLabelImageID === "none") {
                 await handleSave(rectangles, catId, imageUrl);
               } else {

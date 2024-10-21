@@ -1,0 +1,155 @@
+.gallery-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+    margin-top: 20px;
+    
+    
+  }
+  .gallery-contain{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    margin-top: 20px;
+  }
+  
+  .gallery-nav-button {
+    /* position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10; */
+    width: 100px;
+  }
+  
+  .gallery-prev-button {
+    left: 10px;
+  }
+  
+  .gallery-next-button {
+    right: 10px;
+  }
+  
+  .point_sec {
+    font-size: 16px;
+    font-weight: 500;
+    background-color: #242930f0;
+    border-radius: .5rem;
+    margin-bottom: 15px;
+}
+.point_sec a.nav-link {
+  color: #fff;
+}
+a.nav-link.active.active {
+  padding: 10px;
+}
+.dash_back{
+  background-color: #2c2e32;
+}
+span#next {
+  text-align: end;
+  color: #01DCA4;
+  font-size: 19px;
+  font-weight: 100;
+}
+span#previous {
+  color: #01DCA4;
+  font-size: 19px;
+  font-weight: 100;
+}
+.gallery-contain .nav_btnn{
+  --tw-bg-opacity: 1;
+  --tw-shadow: 0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);
+  align-items: center;
+  align-self: center;
+  background-color: #595f66;
+  border-radius: .5rem;
+  box-shadow: var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow);
+  display: flex;
+  flex-direction: row;
+  height: auto;
+  justify-content: center;
+  width: 8rem;
+  border: 2px solid #155042 !important;
+}
+.image_large {
+  margin-left: 24%;
+  margin-top: 5%;
+}
+i.fa.fa-chevron-left {
+  color: #30a738f0;
+  margin-left: 10px;
+}
+i.fa.fa-chevron-right {
+  color: #32ad3af0;
+  margin-right: 10px;
+}
+ul.img_sec {
+  padding: 0;
+}
+.gallery-nav-button {
+
+  border-radius: 9999px;
+  border-width: 1px;
+}
+
+  .image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: auto;
+    width: 1556px;
+    border: 1px solid #155042;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #242930f0;
+    max-height: 90%;
+  }
+
+  
+  .sidebar-controls {
+    position: absolute;
+    top: 30%;
+    right: 25px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+    background-color: #d4eeda;
+    border-radius: 10px;
+    padding: 20px 5px 20px 5px;
+    display: block;
+  }
+  
+  .my_button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    font-size: 18px;
+  }
+  
+  .green-background-select {
+    background-color: #28a745;
+    color: white;
+    padding: 0;
+  }
+  
+  .green-background-draw {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  
+  .disabled {
+    pointer-events: none;
+    opacity: 0.5; /* Grays out the button */
+  }

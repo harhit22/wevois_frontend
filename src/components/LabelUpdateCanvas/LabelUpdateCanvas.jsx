@@ -7,15 +7,14 @@ import { purple } from "@mui/material/colors";
 import useKeyHandler from "../../hooks/useKeyHandler";
 import { BaseURL } from "../../constant/BaseUrl";
 
-const LabelCanvas = ({
+const LabelUpdateCanvas = ({
   imageUrl,
   labelData,
   imageid,
   selectedLabel,
-  labelColors,
   setSelectedLabel,
   category,
-  labelsList,
+
   catId,
   projectId,
   setAlreadyLabelImageId,
@@ -25,11 +24,38 @@ const LabelCanvas = ({
 }) => {
   const [image] = useImage(imageUrl);
   const [rectangles, setRectangles] = useState([]);
+  const [labelsList, setLabelsList] = useState([]);
+  const [labelColors, setLabelColors] = useState([]);
 
   // eslint-disable-next-line
   const [cursorStyle] = useState("default");
 
   console.log(imageid);
+
+  useEffect(() => {
+    const categories_data = async () => {
+      try {
+        const response = await fetch(
+          `${BaseURL}project/${catId}/${category}/categories_data/`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch projects.");
+        }
+        const data = await response.json();
+        setLabelsList(data.data);
+        setLabelColors(data.colors);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    categories_data();
+  }, [catId, category]);
 
   useEffect(() => {
     // eslint-disable-next-line
@@ -45,34 +71,26 @@ const LabelCanvas = ({
   }, [cursorStyle]);
 
   useEffect(() => {
-    
     const fetchLabels = async () => {
       try {
         const response = await fetch(
-          `${BaseURL}categoryImage/Labels/labels/${imageid}/`,
+          `${BaseURL}categoryImageSave/labels/${imageid}/`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
+
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
+
         const data = await response.json();
-        setRectangles((prevRectangles) => {
-          const newRects = data.filter(
-            (newRect) =>
-              !prevRectangles.some(
-                (rect) =>
-                  rect.x === newRect.x &&
-                  rect.y === newRect.y &&
-                  rect.width === newRect.width &&
-                  rect.height === newRect.height
-              )
-          );
-          return [...newRects];
-        });
+        console.log("Fetched data:", data); // Log fetched data
+
+        // Directly set rectangles to the fetched data
+        setRectangles(data); // Assuming data is an array of rectangles
       } catch (error) {
         console.error("There was an error fetching the labels!", error);
       }
@@ -106,6 +124,7 @@ const LabelCanvas = ({
   }, [imageid, catId, setAlreadyLabelImageId]);
 
   const get_label_image_id = async () => {
+    alert(imageid);
     try {
       const response = await fetch(
         `${BaseURL}categoryImage/get_label_image/${imageid}/${catId}/`,
@@ -119,6 +138,7 @@ const LabelCanvas = ({
         throw new Error("Failed to fetch the label image.");
       }
       const data = await response.json();
+      alert(data);
       setAlreadyLabelImageId(data);
     } catch (error) {
       console.error("Error:", error);
@@ -360,41 +380,42 @@ const LabelCanvas = ({
         <div>
           <Stage
             width={Math.min(window.innerWidth, 1000)}
-            height={Math.min(window.innerHeight - 30, 900)}
+            height={Math.min(window.innerHeight - 30, 3000)}
             onMouseDown={handleMouseDown}
           >
             <Layer>
               <KonvaImage image={image} stroke="black" strokeWidth={4} />
-              {rectangles.map((rect, i) => (
-                <React.Fragment key={i}>
-                  <Rect
-                    fill={"#" + rect.color || "red"}
-                    x={rect.x}
-                    y={rect.y}
-                    width={rect.width}
-                    height={rect.height}
-                    stroke={"black" || "red"}
-                    strokeWidth={2}
-                    opacity={isRectSelected(i) ? 0.6 : 0.2}
-                    onClick={() => handleRectSelect(i)}
-                  />
-                  <Text
-                    text={rect.name}
-                    x={rect.x + 5}
-                    y={rect.y + 5}
-                    fontSize={16}
-                    fill={selectedRectIndex === i ? "black" : "white"}
-                  />
-                  <Text
-                    text={i + 1}
-                    x={rect.x + 5}
-                    y={rect.y + 20}
-                    fontSize={20}
-                    fill={selectedRectIndex === i ? "black" : "white"}
-                    color={purple}
-                  />
-                </React.Fragment>
-              ))}
+              {rectangles &&
+                rectangles.map((rect, i) => (
+                  <React.Fragment key={i}>
+                    <Rect
+                      fill={"#" + rect.color || "red"}
+                      x={rect.x}
+                      y={rect.y}
+                      width={rect.width}
+                      height={rect.height}
+                      stroke={"black" || "red"}
+                      strokeWidth={2}
+                      opacity={isRectSelected(i) ? 0.6 : 0.2}
+                      onClick={() => handleRectSelect(i)}
+                    />
+                    <Text
+                      text={rect.label}
+                      x={rect.x + 5}
+                      y={rect.y + 5}
+                      fontSize={16}
+                      fill={selectedRectIndex === i ? "black" : "white"}
+                    />
+                    <Text
+                      text={i + 1}
+                      x={rect.x + 5}
+                      y={rect.y + 20}
+                      fontSize={20}
+                      fill={selectedRectIndex === i ? "black" : "white"}
+                      color={purple}
+                    />
+                  </React.Fragment>
+                ))}
             </Layer>
           </Stage>
         </div>
@@ -405,4 +426,4 @@ const LabelCanvas = ({
   );
 };
 
-export default LabelCanvas;
+export default LabelUpdateCanvas;

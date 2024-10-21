@@ -1,19 +1,24 @@
+// LabelImageGallery.js
 import React, { useState, useEffect } from "react";
 import "./labelImageGallery.css";
 import Loader from "../../ui_components/Loader/Loader";
 import { BaseURL } from "../../constant/BaseUrl";
+import LabeLUpdateGallery from "../LabelUpdateGallery/LabeLUpdateGallery";
+import ModelUpdateCanvas from "../ModelUpadeCanvas/ModelUpdateCanvas";
 
 const LabelImageGallery = ({ path, projectId }) => {
   const [images, setImages] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState(""); // Category filter
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [hasMore, setHasMore] = useState(true);
-  const [categories, setCategories] = useState([]); // Store categories
+  const [categories, setCategories] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedRectIndex, setSelectedRectIndex] = useState(null);
 
   useEffect(() => {
-    // Fetch available categories only if path is "labeled-images"
     if (path === "labeled-images") {
       const fetchCategories = async () => {
         try {
@@ -72,6 +77,18 @@ const LabelImageGallery = ({ path, projectId }) => {
     setCurrentPage(pageNumber);
   };
 
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+    setSelectedRectIndex(0); // Set selectedRectIndex to 0 when opening modal
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
+    setSelectedRectIndex(null); // Optionally reset when closing
+  };
+
   const generatePageNumbers = () => {
     const pages = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -86,7 +103,6 @@ const LabelImageGallery = ({ path, projectId }) => {
 
   return (
     <div>
-      {/* Render filter only if path is labeled-images */}
       {path === "labeled-images" && (
         <div className="filter-container">
           <label htmlFor="categoryFilter">Filter by Category:</label>
@@ -105,10 +121,13 @@ const LabelImageGallery = ({ path, projectId }) => {
         </div>
       )}
 
-      {/* Image Gallery */}
       <div className="image-gallery">
         {images.map((image) => (
-          <div className="card" key={image.id}>
+          <div
+            className="card"
+            key={image.id}
+            onClick={() => handleImageClick(image)} // Open modal on image click
+          >
             <div>
               <div className="thumbnail">
                 <img src={image.firebase_url} alt={image.filename} />
@@ -128,28 +147,46 @@ const LabelImageGallery = ({ path, projectId }) => {
                     </div>
                   ))}
               </div>
-              {image.uploaded_by && (
-                <p className="m-2">uploaded_by {image.uploaded_by}</p>
-              )}
+              <div className="meta-data">
+                <p>{image.filename}</p>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Pagination */}
       <div className="pagination">
         {generatePageNumbers().map((pageNumber) => (
           <button
             key={pageNumber}
-            className={`btn btn-pagination ${
-              currentPage === pageNumber ? "active" : ""
-            }`}
             onClick={() => handlePageChange(pageNumber)}
+            disabled={pageNumber === currentPage}
           >
             {pageNumber}
           </button>
         ))}
       </div>
+
+      {selectedImage ? (
+        <ModelUpdateCanvas
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          projectId={projectId} // Pass projectId
+          catId={selectedImage.category} // Pass catId
+          category={selectedImage.category_name} // Pass category
+        >
+          <LabeLUpdateGallery
+            image={selectedImage}
+            projectId={projectId}
+            catId={selectedImage.category} // Pass catId
+            category={selectedImage.category_name}
+            selectedRectIndex={selectedRectIndex}
+            setSelectedRectIndex={setSelectedRectIndex}
+          />
+        </ModelUpdateCanvas>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

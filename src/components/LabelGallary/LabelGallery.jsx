@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import LabelCanvas from "../LabelCanvas/LabelCanvas";
 import "./LabelGallery.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Loader from "../ui/Loader/Loader";
 import { BaseURL } from "../../constant/BaseUrl";
 
 const LabelGallery = ({
   images,
+
   labelsList,
   labelColors,
   selectedLabel,
