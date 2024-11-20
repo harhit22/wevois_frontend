@@ -18,6 +18,7 @@ const AnnotatedImages = () => {
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
   const [totalImages, setTotalImages] = useState(0);
+  const [blurImages, setBlurImages] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -92,29 +93,23 @@ const AnnotatedImages = () => {
     url.searchParams.append("train_count", trainCount);
     url.searchParams.append("val_count", valCount);
     url.searchParams.append("test_count", testCount);
+    url.searchParams.append("blur_images", blurImages);
 
     const xhr = new XMLHttpRequest();
+    xhr.timeout = 0;
     xhr.open("POST", url.toString(), true);
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader(
       "Authorization",
       `Bearer ${localStorage.getItem("token")}`
     );
-    setDownloadProgress(0);
 
     xhr.onload = async () => {
-      setShowProgress(false);
-      if (xhr.status === 200) {
-        const blob = new Blob([xhr.response]);
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = downloadUrl;
-        link.setAttribute("download", `${category}_dataset.zip`);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        setShowModal(false);
-        setDownloadProgress(0);
+      
+      if (xhr.status === 202) {
+        const data = xhr.response;
+        const taskId = data.task_id; // Assume task_id is returned upon initiating download
+        trackTaskStatus(taskId); // Start tracking task status
       } else {
         console.error("Error downloading dataset:", xhr.statusText);
         alert("Failed to download dataset. Please try again.");
@@ -129,7 +124,7 @@ const AnnotatedImages = () => {
       setDownloadProgress(0);
     };
 
-    xhr.responseType = "blob";
+    xhr.responseType = "json";
     xhr.send(
       JSON.stringify({
         category_id: id,
@@ -137,9 +132,68 @@ const AnnotatedImages = () => {
         train_count: trainCount,
         val_count: valCount,
         test_count: testCount,
+        blur_images: blurImages,
       })
     );
   };
+
+  // Function to poll for task status
+  const trackTaskStatus = async (taskId) => {
+    let downloadStarted = false;
+  
+    const interval = setInterval(async () => {
+      if (downloadStarted) {
+        clearInterval(interval);
+        return;
+      }
+  
+      try {
+        const response = await fetch(
+          `${BaseURL}project/yolov8/task-status/?task_id=${taskId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            cache: "no-store", // Ensures a fresh request each time
+          }
+        );
+  
+        const contentType = response.headers.get("Content-Type");
+  
+        if (response.ok && contentType && contentType.includes("application/zip")) {
+          // Task complete, download only if not already started
+          downloadStarted = true;
+          clearInterval(interval);
+  
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "dataset.zip";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          alert("Download complete!");
+        } else {
+          // Handle JSON response for in-progress or failed status
+          const data = await response.json();
+  
+          if (data.status === "failed") {
+            alert("Task failed: " + (data.message || "Unknown error"));
+            clearInterval(interval);
+          } else if (data.status === "In progress") {
+            setDownloadProgress((prev) => Math.min(prev + 10, 100)); // Update progress indicator
+          }
+        }
+      } catch (error) {
+        clearInterval(interval);
+        console.error("Error tracking task status:", error);
+        alert("Error tracking task status. Please try again.");
+      }
+    }, 5000); // Poll every 5 seconds
+  };
+  
 
   const handleCountChange = (type, value) => {
     const totalCount = trainCount + valCount + testCount;
@@ -272,6 +326,18 @@ const AnnotatedImages = () => {
                 handleCountChange("test", Number(e.target.value))
               }
             />
+          </div>
+          <div className="form-check mt-3">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="blurCheckbox"
+              checked={blurImages}
+              onChange={(e) => setBlurImages(e.target.value)}
+            />
+            <label className="form-check-label" htmlFor="blurCheckbox">
+              Blur Images
+            </label>
           </div>
           {showProgress && (
             <div className="progress mt-3">

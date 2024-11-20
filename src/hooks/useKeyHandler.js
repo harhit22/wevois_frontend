@@ -58,7 +58,7 @@ const useKeyHandler = (
             setIsSaving(true); // Start the save process
 
             try {
-              alert(alreadyLabelImageID);
+              
               if (alreadyLabelImageID === "none") {
                 await handleSave(rectangles, catId, imageUrl);
               } else {

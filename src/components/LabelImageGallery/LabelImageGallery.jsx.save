@@ -17,7 +17,6 @@ const LabelImageGallery = ({ path, projectId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedRectIndex, setSelectedRectIndex] = useState(null);
-  const [refreshGallery, setRefreshGallery] = useState(false);
 
   useEffect(() => {
     if (path === "labeled-images") {
@@ -42,37 +41,38 @@ const LabelImageGallery = ({ path, projectId }) => {
     }
   }, [path, projectId]);
 
-  const fetchImages = async () => {
-    setLoading(true);
-    try {
-      const loggedInUsername = localStorage.getItem("username");
-      let apiUrl = `${BaseURL}lcadmin/${path}/?page=${currentPage}&uploaded_by=${loggedInUsername}`;
-
-      if (categoryFilter) {
-        apiUrl += `&category_name=${categoryFilter}`;
-      }
-
-      const response = await fetch(apiUrl, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch images.");
-      }
-      const data = await response.json();
-      console.log(data, "mydata");
-      setImages(data.results);
-      setTotalPages(Math.ceil(data.count / data.page_size));
-      setHasMore(currentPage < totalPages);
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchImages = async () => {
+      setLoading(true);
+      try {
+        const loggedInUsername = localStorage.getItem("username");
+        let apiUrl = `${BaseURL}lcadmin/${path}/?page=${currentPage}&uploaded_by=${loggedInUsername}`;
+
+        if (categoryFilter) {
+          apiUrl += `&category_name=${categoryFilter}`;
+        }
+
+        const response = await fetch(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch images.");
+        }
+        const data = await response.json();
+        console.log(data, "image_data"o
+)
+        setImages(data.results);
+        setTotalPages(Math.ceil(data.count / data.page_size));
+        setHasMore(currentPage < totalPages);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchImages();
   }, [currentPage, categoryFilter, path, totalPages]);
 
@@ -90,47 +90,19 @@ const LabelImageGallery = ({ path, projectId }) => {
     setIsModalOpen(false);
     setSelectedImage(null);
     setSelectedRectIndex(null); // Optionally reset when closing
-    fetchImages();
   };
 
-  // Inside LabelImageGallery.js
   const generatePageNumbers = () => {
     const pages = [];
-    const maxPageNumbersToShow = 5;
-    const startPage = Math.max(1, currentPage - 2);
-    const endPage = Math.min(totalPages, currentPage + 2);
-
-    // Add first page and ellipsis if necessary
-    if (startPage > 1) {
-      pages.push(1);
-      if (startPage > 2) pages.push("...");
-    }
-
-    // Add page numbers within the calculated range
-    for (let i = startPage; i <= endPage; i++) {
+    for (let i = 1; i <= totalPages; i++) {
       pages.push(i);
     }
-
-    // Add ellipsis and last page if necessary
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) pages.push("...");
-      pages.push(totalPages);
-    }
-
     return pages;
   };
-
 
   if (loading) {
     return <Loader />;
   }
-
-  const calculateScaleFactor = (width, height) => {
-    const saclefacterpercentage = 16000 / width;
-
-    const scalefactor = 100 / saclefacterpercentage;
-    return scalefactor;
-  };
 
   return (
     <div>
@@ -153,76 +125,50 @@ const LabelImageGallery = ({ path, projectId }) => {
       )}
 
       <div className="image-gallery">
-        {images.map((image) => {
-          const scaleFactor = calculateScaleFactor(
-            image.image_width,
-            image.image_height
-          );
-
-          return (
-            <div
-              className="card"
-              key={image.id}
-              onClick={() => handleImageClick(image)}
-            >
-              <div>
-                <div className="thumbnail">
-                  <img src={image.firebase_url} alt={image.filename} />
-                  {image.labels &&
-                    image.labels.map((label, index) => (
-                      <div
-                        key={index}
-                        className="label"
-                        style={{
-                          left: `${label.x / scaleFactor}px`,
-                          top: `${label.y / scaleFactor}px`,
-                          width: `${label.width / scaleFactor}px`,
-                          height: `${label.height / scaleFactor}px`,
-                        }}
-                      >
-                        {label.label}
-                      </div>
-                    ))}
-                </div>
-                {image.uploaded_by && (
-                  <p className="m-2">uploaded_by {image.uploaded_by}</p>
-                )}
+        {images.map((image) => (
+          <div
+            className="card"
+            key={image.id}
+            onClick={() => handleImageClick(image)} // Open modal on image click
+          >
+            <div>
+              <div className="thumbnail">
+                <img src={image.firebase_url} alt={image.filename} />
+                {image.labels &&
+                  image.labels.map((label, index) => (
+                    <div
+                      key={index}
+                      className="label"
+                      style={{
+                        left: `${label.x / 4}px`,
+                        top: `${label.y / 4}px`,
+                        width: `${label.width / 4}px`,
+                        height: `${label.height / 4}px`,
+                      }}
+                    >
+                      {label.label}
+                    </div>
+                  ))}
+              </div>
+              <div className="meta-data">
+                <p>{image.filename}</p>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       <div className="pagination">
-  {generatePageNumbers().map((pageNumber, index) => {
-    if (pageNumber === "...") {
-      return (
-        <span key={index} className="pagination-ellipsis">
-          {pageNumber}
-        </span>
-      );
-    }
-    return (
-      <button
-        key={pageNumber}
-        className={`btn btn-pagination ${currentPage === pageNumber ? "active" : ""}`}
-        onClick={() => handlePageChange(pageNumber)}
-      >
-        {pageNumber}
-      </button>
-    );
-    })}
-    {/* Next Page Button */}
-    {currentPage < totalPages && (
-      <button
-      className="btn btn-pagination"
-      onClick={() => handlePageChange(currentPage + 1)}
-      >
-       Next
-      </button>
-      )}
-    </div>
-
+        {generatePageNumbers().map((pageNumber) => (
+          <button
+            key={pageNumber}
+            onClick={() => handlePageChange(pageNumber)}
+            disabled={pageNumber === currentPage}
+          >
+            {pageNumber}
+          </button>
+        ))}
+      </div>
 
       {selectedImage ? (
         <ModelUpdateCanvas

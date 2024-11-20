@@ -274,9 +274,7 @@ const Canvas = ({
     handleSave(updatedRectangles);
     setCursorStyle("grab");
   };
-
-  // ----------------------------------saving data ----------------------------------------
-  const handleSave = async (filteredRectangles) => {
+   const handleSave = async (filteredRectangles) => {
     const toastId = toast.loading("Processing...");
     try {
       setIsSaving(true);
@@ -298,6 +296,17 @@ const Canvas = ({
       }
       const blob = await response.blob();
       imageData.append("image_file", imageName);
+
+      const imageDimensions = await new Promise((resolve, reject) => {
+        const img = new window.Image();
+        img.src = URL.createObjectURL(blob);
+
+        img.onload = () => resolve({ width: img.width, height: img.height });
+        img.onerror = (e) => reject(new Error("Failed to load image"));
+      });
+
+      imageData.append("image_width", imageDimensions.width);
+      imageData.append("image_height", imageDimensions.height);
 
       let image_id = null;
 
@@ -595,3 +604,4 @@ const Canvas = ({
 };
 
 export default Canvas;
+

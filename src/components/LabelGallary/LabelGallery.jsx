@@ -7,7 +7,6 @@ import { BaseURL } from "../../constant/BaseUrl";
 
 const LabelGallery = ({
   images,
-
   labelsList,
   labelColors,
   selectedLabel,
@@ -17,7 +16,7 @@ const LabelGallery = ({
   id,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [labelData, setLabelData] = useState({});
+  const [labelData, setLabelData] = useState([]);
   const [boxSelection, setBoxSelection] = useState(true);
   const [cursorStyle, setCursorStyle] = useState("default");
   const [showOpacity, setShowOpacity] = useState(null);
@@ -26,12 +25,13 @@ const LabelGallery = ({
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [selectedRectIndex, setSelectedRectIndex] = useState(null);
+  const [previousImage, setPreviousImage] = useState(null);
+  const [disabled, setDisable] = useState(true);
 
   useEffect(() => {
-    // Check for token and redirect to login if not found
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/login"); // Redirect to login page if no token is found
+      navigate("/login");
     }
   }, [navigate]);
 
@@ -44,8 +44,8 @@ const LabelGallery = ({
   }, [cursorStyle]);
 
   const fetchNextImage = useCallback(async () => {
-    setSelectedRectIndex(0);
     setLoading(true);
+    setDisable(true);
     try {
       const response = await fetch(
         `${BaseURL}categoryImage/next/${id}/${catId}/`,
@@ -59,8 +59,8 @@ const LabelGallery = ({
         throw new Error("Failed to fetch the next image.");
       }
       const data = await response.json();
-      console.log(data);
-      setCurrentImage(data);
+      setCurrentImage(data); // Make sure to update current image
+      setLabelData([]); // Reset labelData when fetching a new image
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -73,7 +73,9 @@ const LabelGallery = ({
   }, [id, catId, fetchNextImage]);
 
   const handleNext = useCallback(async () => {
+    setPreviousImage();
     setAlreadyLabelImageId("none");
+    setLabelData({});
     try {
       await fetchNextImage();
 
@@ -102,12 +104,52 @@ const LabelGallery = ({
     setBoxSelection(false);
   }, [fetchNextImage, currentImage]);
 
+  const fetchPreviousImage = useCallback(async () => {
+    setDisable(false);
+    try {
+      let response;
+      const userId = localStorage.getItem("user_id");
+      const token = localStorage.getItem("token");
+
+      if (previousImage) {
+        response = await fetch(
+          `${BaseURL}categoryImage/previous_image/${userId}/${previousImage.id}/${category}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } else {
+        response = await fetch(
+          `${BaseURL}categoryImage/previous_image/${userId}/${category}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch the previous image.");
+      }
+
+      const data = await response.json();
+      console.log(data, "previous image data");
+      // Set previousImage based on fetched data
+      setPreviousImage(data.image);
+      setLabelData(data.labels);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }, [previousImage, category]);
+
   const handlePrevious = useCallback(() => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
-    setBoxSelection(false);
-  }, [images.length]);
+    setLoading(true);
+    fetchPreviousImage();
+    setLoading(false);
+  }, [fetchPreviousImage]);
 
   const handleLabelChange = (rectangles) => {
     setLabelData((prevLabelData) => ({
@@ -123,7 +165,10 @@ const LabelGallery = ({
         handlePrevious();
       } else if (e.code === "ArrowRight") {
         e.preventDefault();
-        handleNext();
+        console.log(disabled);
+        if (!disabled) {
+          handleNext();
+        }
       }
     };
 
@@ -132,7 +177,7 @@ const LabelGallery = ({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handlePrevious, handleNext]);
+  }, [handlePrevious, handleNext, disabled]);
 
   if (loading) {
     return <Loader />;
@@ -142,24 +187,23 @@ const LabelGallery = ({
     <>
       <div className="gallery-contain">
         <div className="nav_btnn">
-          <span
+          <button
             to="#"
             id="previous"
             onClick={handlePrevious}
             className="gallery-nav-button gallery-prev-button"
-            disabled={loading}
           >
-            <i class="fa fa-chevron-left"></i>
-          </span>
-          <span
+            <i className="fa fa-chevron-left"></i>
+          </button>
+          <button
             to="#"
             id="next"
             onClick={handleNext}
-            className="gallery-nav-button gallery-prev-button"
-            disabled={loading}
+            className="gallery-nav-button gallery-next-button"
+            disabled={loading || disabled}
           >
-            <i class="fa fa-chevron-right"></i>
-          </span>
+            <i className="fa fa-chevron-right"></i>
+          </button>
         </div>
       </div>
 
@@ -169,29 +213,52 @@ const LabelGallery = ({
             <div className="loading-screen">Loading...</div>
           ) : currentImage ? (
             <>
-              <LabelCanvas
-                imageUrl={currentImage.image.firebase_url}
-                labelData={labelData[currentIndex] || []}
-                onLabelChange={handleLabelChange}
-                boxSelection={boxSelection}
-                projectId={id}
-                showOpacity={showOpacity}
-                setShowOpacity={setShowOpacity}
-                imageid={currentImage.image.id}
-                selectedLabel={selectedLabel}
-                setSelectedLabel={setSelectedLabel}
-                labelColors={labelColors}
-                category={category}
-                labelsList={labelsList}
-                catId={catId}
-                alreadyLabelImageID={alreadyLabelImageID}
-                setAlreadyLabelImageId={setAlreadyLabelImageId}
-                setSelectedRectIndex={setSelectedRectIndex}
-                selectedRectIndex={selectedRectIndex}
-              />
+              {previousImage ? (
+                <LabelCanvas
+                  imageUrl={previousImage.firebase_url} // Ensure this matches your API response
+                  labelData={labelData}
+                  onLabelChange={handleLabelChange}
+                  boxSelection={boxSelection}
+                  projectId={id}
+                  imageid={previousImage.id} // Ensure this is the ID of the previous image
+                  selectedLabel={selectedLabel}
+                  setSelectedLabel={setSelectedLabel}
+                  labelColors={labelColors}
+                  category={category}
+                  labelsList={labelsList}
+                  catId={catId}
+                  alreadyLabelImageID={alreadyLabelImageID}
+                  setAlreadyLabelImageId={setAlreadyLabelImageId}
+                  setSelectedRectIndex={setSelectedRectIndex}
+                  selectedRectIndex={selectedRectIndex}
+                  setDisable={setDisable}
+                />
+              ) : (
+                <LabelCanvas
+                  imageUrl={currentImage.image.firebase_url}
+                  labelData={[]}
+                  onLabelChange={handleLabelChange}
+                  boxSelection={boxSelection}
+                  projectId={id}
+                  showOpacity={showOpacity}
+                  setShowOpacity={setShowOpacity}
+                  imageid={currentImage.image.id}
+                  selectedLabel={selectedLabel}
+                  setSelectedLabel={setSelectedLabel}
+                  labelColors={labelColors}
+                  category={category}
+                  labelsList={labelsList}
+                  catId={catId}
+                  alreadyLabelImageID={alreadyLabelImageID}
+                  setAlreadyLabelImageId={setAlreadyLabelImageId}
+                  setSelectedRectIndex={setSelectedRectIndex}
+                  selectedRectIndex={selectedRectIndex}
+                  setDisable={setDisable}
+                />
+              )}
             </>
           ) : (
-            <p>Loading...</p>
+            <p style={{ color: "#fff" }}>No image available</p>
           )}
         </div>
       </div>

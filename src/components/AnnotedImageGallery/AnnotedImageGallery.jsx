@@ -30,6 +30,7 @@ const AnnotedImageGallery = ({ path, projectId }) => {
         throw new Error("Failed to fetch images.");
       }
       const data = await response.json();
+      console.log(data);
       setImages(data.results);
       setTotalPages(Math.ceil(data.count / data.page_size));
     } catch (error) {
@@ -41,12 +42,12 @@ const AnnotedImageGallery = ({ path, projectId }) => {
 
   useEffect(() => {
     fetchImages();
-  }, [currentPage, path, refreshGallery]); // Added `refreshGallery` to re-fetch images when it changes
+  }, [currentPage, path, refreshGallery]);
 
   const handleImageClick = (image) => {
     setSelectedImage(image);
     setSelectedLabelData(image.labels || []);
-    setIsModalOpen(true); // Open the modal when an image is clicked
+    setIsModalOpen(true);
   };
 
   const handlePageChange = (pageNumber) => {
@@ -54,24 +55,50 @@ const AnnotedImageGallery = ({ path, projectId }) => {
   };
 
   const generatePageNumbers = () => {
-    const pages = [];
+  const pages = [];
+  const maxPagesToShow = 5; // Adjust the number of pages to show as needed
+
+  if (totalPages <= maxPagesToShow) {
     for (let i = 1; i <= totalPages; i++) {
       pages.push(i);
     }
-    return pages;
-  };
+  } else {
+    pages.push(1);
+    if (currentPage > 3) {
+      pages.push("...");
+    }
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    if (currentPage < totalPages - 2) {
+      pages.push("...");
+    }
+    pages.push(totalPages);
+  }
+
+  return pages;
+};
+
 
   const closeModal = () => {
-    setIsModalOpen(false); // Close the modal
-    setSelectedImage(null); // Clear the selected image
-    setSelectedLabelData([]); // Clear the selected label data
+    setIsModalOpen(false);
+    setSelectedImage(null);
+    setSelectedLabelData([]);
     fetchImages();
   };
 
-  // Callback to refresh gallery after saving the image
   const handleImageUpdate = () => {
-    closeModal(); // Close the modal after update
-    setRefreshGallery((prev) => !prev); // Toggle refresh to trigger the useEffect and fetch the updated data
+    closeModal();
+    setRefreshGallery((prev) => !prev);
+  };
+
+  const calculateScaleFactor = (width, height) => {
+    const saclefacterpercentage = 16000 / width;
+
+    const scalefactor = 100 / saclefacterpercentage;
+    return scalefactor;
   };
 
   if (loading) {
@@ -81,51 +108,76 @@ const AnnotedImageGallery = ({ path, projectId }) => {
   return (
     <div>
       <div className="image-gallery">
-        {images.map((image) => (
-          <div
-            className="card"
-            key={image.id}
-            onClick={() => handleImageClick(image)}
-          >
-            <div>
-              <div className="thumbnail">
-                <img src={image.firebase_url} alt={image.filename} />
-                {image.labels &&
-                  image.labels.map((label, index) => (
-                    <div
-                      key={index}
-                      className="label"
-                      style={{
-                        left: `${label.x / 4}px`,
-                        top: `${label.y / 4}px`,
-                        width: `${label.width / 4}px`,
-                        height: `${label.height / 4}px`,
-                      }}
-                    >
-                      {label.label}
-                    </div>
-                  ))}
+        {images.map((image) => {
+          const scaleFactor = calculateScaleFactor(
+            image.image_width,
+            image.image_height
+          );
+
+          return (
+            <div
+              className="card"
+              key={image.id}
+              onClick={() => handleImageClick(image)}
+            >
+              <div>
+                <div className="thumbnail">
+                  <img src={image.firebase_url} alt={image.filename} />
+                  {image.labels &&
+                    image.labels.map((label, index) => (
+                      <div
+                        key={index}
+                        className="label"
+                        style={{
+                          left: `${label.x / scaleFactor}px`,
+                          top: `${label.y / scaleFactor}px`,
+                          width: `${label.width / scaleFactor}px`,
+                          height: `${label.height / scaleFactor}px`,
+                        }}
+                      >
+                        {label.label}
+                      </div>
+                    ))}
+                </div>
+                {image.uploaded_by && (
+                  <p className="m-2">uploaded_by {image.uploaded_by}</p>
+                )}
               </div>
-              {image.uploaded_by && (
-                <p className="m-2">uploaded_by {image.uploaded_by}</p>
-              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      <div className="pagination">
-        {generatePageNumbers().map((pageNumber) => (
+        <div className="pagination">
+        {generatePageNumbers().map((pageNumber, index) => {
+          if (pageNumber === "...") {
+            return (
+              <span key={index} className="pagination-ellipsis">
+                {pageNumber}
+              </span>
+            );
+          }
+          return (
+            <button
+              key={pageNumber}
+              className={`btn btn-pagination ${
+                currentPage === pageNumber ? "active" : ""
+              }`}
+              onClick={() => handlePageChange(pageNumber)}
+            >
+              {pageNumber}
+            </button>
+          );
+        })}
+        {/* Next Page Button */}
+        {currentPage < totalPages && (
           <button
-            key={pageNumber}
-            className={`btn btn-pagination ${
-              currentPage === pageNumber ? "active" : ""
-            }`}
-            onClick={() => handlePageChange(pageNumber)}
+            className="btn btn-pagination"
+            onClick={() => handlePageChange(currentPage + 1)}
           >
-            {pageNumber}
+            Next
           </button>
-        ))}
+        )}
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal}>
@@ -134,7 +186,7 @@ const AnnotedImageGallery = ({ path, projectId }) => {
             projectId={projectId}
             initialImage={selectedImage}
             initallabelData={selectedLabelData}
-            onImageUpdate={handleImageUpdate} // Pass the callback to trigger refresh
+            onImageUpdate={handleImageUpdate}
           />
         )}
       </Modal>

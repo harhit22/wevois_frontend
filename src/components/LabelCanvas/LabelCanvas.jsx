@@ -22,6 +22,7 @@ const LabelCanvas = ({
   alreadyLabelImageID,
   setSelectedRectIndex,
   selectedRectIndex,
+  setDisable,
 }) => {
   const [image] = useImage(imageUrl);
   const [rectangles, setRectangles] = useState([]);
@@ -29,57 +30,75 @@ const LabelCanvas = ({
   // eslint-disable-next-line
   const [cursorStyle] = useState("default");
 
-  console.log(imageid);
+  console.log(imageid, labelData);
 
   useEffect(() => {
-    // eslint-disable-next-line
-    setRectangles(labelData);
+    if (labelData === 0) {
+      setRectangles(labelData);
+    }
+
+    if (Array.isArray(labelData)) {
+      // Create a new array and set it to rectangles
+      setRectangles([...labelData]);
+    }
+
     document.body.style.cursor = cursorStyle;
-    if (rectangles.length === 1) {
+
+    if (labelData.length === 1) {
       handleRectSelect(0);
     }
+
     return () => {
       document.body.style.cursor = "default";
     };
-    // eslint-disable-next-line
   }, [cursorStyle]);
 
   useEffect(() => {
-    
+    if (labelData.length > 0) {
+      setRectangles([...labelData]);
+    }
+  }, [labelData]);
+
+  useEffect(() => {
     const fetchLabels = async () => {
-      try {
-        const response = await fetch(
-          `${BaseURL}categoryImage/Labels/labels/${imageid}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setRectangles((prevRectangles) => {
-          const newRects = data.filter(
-            (newRect) =>
-              !prevRectangles.some(
-                (rect) =>
-                  rect.x === newRect.x &&
-                  rect.y === newRect.y &&
-                  rect.width === newRect.width &&
-                  rect.height === newRect.height
-              )
+      console.log(labelData, "i am hereeererer");
+      if (labelData.length === 0 || Object.keys(labelData).length === 0) {
+        console.log("length is 0");
+        try {
+          const response = await fetch(
+            `${BaseURL}categoryImage/Labels/labels/${imageid}/`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
           );
-          return [...newRects];
-        });
-      } catch (error) {
-        console.error("There was an error fetching the labels!", error);
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const data = await response.json();
+          console.log(data, "fetched data");
+          setRectangles((prevRectangles) => {
+            const newRects = data.filter(
+              (newRect) =>
+                !prevRectangles.some(
+                  (rect) =>
+                    rect.x === newRect.x &&
+                    rect.y === newRect.y &&
+                    rect.width === newRect.width &&
+                    rect.height === newRect.height
+                )
+            );
+            return [...newRects];
+          });
+        } catch (error) {
+          console.error("There was an error fetching the labels!", error);
+        }
       }
     };
 
     fetchLabels();
-  }, [imageid]);
+  }, [imageid, labelData.length]);
 
   useEffect(() => {
     const get_label_image_id = async () => {
@@ -275,6 +294,7 @@ const LabelCanvas = ({
         autoClose: 3000,
       });
     }
+    setDisable(false);
   };
 
   const handleSaveAlreadyLabelImage = async (
@@ -335,6 +355,7 @@ const LabelCanvas = ({
       console.error("Error saving labels:", error);
       toast.error("Error saving labels");
     }
+    setDisable(false);
   };
 
   useKeyHandler(
@@ -379,7 +400,7 @@ const LabelCanvas = ({
                     onClick={() => handleRectSelect(i)}
                   />
                   <Text
-                    text={rect.name}
+                    text={rect.label}
                     x={rect.x + 5}
                     y={rect.y + 5}
                     fontSize={16}

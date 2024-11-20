@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import useImage from "../../helper/useImage";
-import { Stage, Layer, Image as KonvaImage, Rect, Text } from "react-konva";
+import {
+  Stage,
+  Layer,
+  Image as KonvaImage,
+  Rect,
+  Text,
+  Group,
+} from "react-konva";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { purple } from "@mui/material/colors";
@@ -384,38 +391,43 @@ const LabelUpdateCanvas = ({
             onMouseDown={handleMouseDown}
           >
             <Layer>
-              <KonvaImage image={image} stroke="black" strokeWidth={4} />
-              {rectangles &&
-                rectangles.map((rect, i) => (
-                  <React.Fragment key={i}>
-                    <Rect
-                      fill={"#" + rect.color || "red"}
-                      x={rect.x}
-                      y={rect.y}
-                      width={rect.width}
-                      height={rect.height}
-                      stroke={"black" || "red"}
-                      strokeWidth={2}
-                      opacity={isRectSelected(i) ? 0.6 : 0.2}
-                      onClick={() => handleRectSelect(i)}
-                    />
-                    <Text
-                      text={rect.label}
-                      x={rect.x + 5}
-                      y={rect.y + 5}
-                      fontSize={16}
-                      fill={selectedRectIndex === i ? "black" : "white"}
-                    />
-                    <Text
-                      text={i + 1}
-                      x={rect.x + 5}
-                      y={rect.y + 20}
-                      fontSize={20}
-                      fill={selectedRectIndex === i ? "black" : "white"}
-                      color={purple}
-                    />
-                  </React.Fragment>
-                ))}
+              <Group
+                x={(Math.min(window.innerWidth, 1000) - 640) / 2}
+                y={(Math.min(window.innerHeight - 30, 900) - 640) / 2}
+              >
+                <KonvaImage image={image} stroke="black" strokeWidth={4} />
+                {rectangles &&
+                  rectangles.map((rect, i) => (
+                    <React.Fragment key={i}>
+                      <Rect
+                        fill={"#" + rect.color || "red"}
+                        x={rect.x}
+                        y={rect.y}
+                        width={rect.width}
+                        height={rect.height}
+                        stroke={"black" || "red"}
+                        strokeWidth={2}
+                        opacity={isRectSelected(i) ? 0.6 : 0.2}
+                        onClick={() => handleRectSelect(i)}
+                      />
+                      <Text
+                        text={rect.label}
+                        x={rect.x + 5}
+                        y={rect.y + 5}
+                        fontSize={16}
+                        fill={selectedRectIndex === i ? "black" : "white"}
+                      />
+                      <Text
+                        text={i + 1}
+                        x={rect.x + 5}
+                        y={rect.y + 20}
+                        fontSize={20}
+                        fill={selectedRectIndex === i ? "black" : "white"}
+                        color={purple}
+                      />
+                    </React.Fragment>
+                  ))}
+              </Group>
             </Layer>
           </Stage>
         </div>
